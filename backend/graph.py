@@ -10,20 +10,27 @@ DEFAULT_CVE_PATH = os.path.join(BASE_DIR, "data", "cves.json")
 
 
 # --- REAL-WORLD THREAT MODELING (DROPDOWN OPTIONS) ---
+# NOTE: these keys MUST exactly match node "id" values in network.json.
+# (Previously these used shortened IDs like "api_gw" / "linux_kernel" /
+# "core_db" / "load_balancer" / "admin_console", which do not exist in
+# network.json — every node there is suffixed _1/_2/_3, or renamed
+# entirely, e.g. linux_legacy_node. That caused find_attack_paths()
+# to fail with "Invalid entry point" for 4 of 4 entry options and
+# 1 of 4 goal options. Fixed below.)
 
 # Maps real-world Entry Points to our specific network nodes
 COMMON_ENTRY_POINTS = {
-    "api_gw": "Public-facing web apps (Unpatched software, Insecure APIs)",
-    "admin_console": "Phishing / Insider Threat (Stolen credentials)",
-    "load_balancer": "Exposed infrastructure / Weak remote endpoints",
-    "linux_kernel": "IoT / Unmanaged legacy devices on network"
+    "api_gw_1": "Public-facing web apps (Unpatched software, Insecure APIs)",
+    "admin_console_1": "Phishing / Insider Threat (Stolen credentials)",
+    "load_balancer_1": "Exposed infrastructure / Weak remote endpoints",
+    "linux_legacy_node": "IoT / Unmanaged legacy devices on network"
 }
 
 # Maps real-world End Goals to our specific network nodes
 COMMON_END_GOALS = {
     "swift_terminal": "Financial gain (Wire fraud, Cryptocurrency theft)",
     "data_warehouse": "Data theft (Customer records, Intellectual property)",
-    "core_db": "Sabotage / Ransomware (Disrupting core services)",
+    "core_db_node_1": "Sabotage / Ransomware (Disrupting core services)",
     "web_app_1": "Botnet building / Persistence (Hijacking compute power)"
 }
 
@@ -84,6 +91,10 @@ def build_graph(network_path=DEFAULT_NETWORK_PATH, cve_path=DEFAULT_CVE_PATH):
         u = edge["from"]
         v = edge["to"]
 
+        # Guard against edges referencing node IDs not present in "nodes"
+        if u not in G or v not in G:
+            continue
+
         target_cvss = G.nodes[v].get("cvss_score", 0.0)
         weight = calculate_edge_weight(target_cvss)
 
@@ -92,7 +103,7 @@ def build_graph(network_path=DEFAULT_NETWORK_PATH, cve_path=DEFAULT_CVE_PATH):
     return G
 
 
-def find_attack_paths(G, entry_node="api_gw", target_node="swift_terminal"):
+def find_attack_paths(G, entry_node="api_gw_1", target_node="swift_terminal"):
     """
     Calculates the highest-risk attack path using Dijkstra's algorithm.
     Validates that the provided nodes actually exist in the graph.
@@ -132,8 +143,14 @@ if __name__ == "__main__":
     for key, desc in options["destinations"].items():
         print(f"  - [{key}]: {desc}")
 
+    # Sanity-check every dropdown option actually resolves to a real node
+    print("\n--- VALIDATING DROPDOWN IDS AGAINST network.json ---")
+    for key in list(options["sources"].keys()) + list(options["destinations"].keys()):
+        status = "OK" if key in graph else "MISSING FROM network.json"
+        print(f"  [{key}] -> {status}")
+
     # Testing a custom scenario: Insider Threat (Phishing) -> Data Theft
-    test_source = "admin_console"
+    test_source = "admin_console_1"
     test_dest = "data_warehouse"
 
     print(f"\nCalculating simulated attack path: {test_source} -> {test_dest}...")
