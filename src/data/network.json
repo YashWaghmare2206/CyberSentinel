@@ -1,0 +1,613 @@
+{
+  "nodes": [
+    {
+      "id": "api_gw_1",
+      "name": "Public API Gateway 1",
+      "type": "public",
+      "software": "Apache 2.4.49"
+    },
+    {
+      "id": "api_gw_2",
+      "name": "Public API Gateway 2",
+      "type": "public",
+      "software": "Apache 2.4.49"
+    },
+    {
+      "id": "api_gw_3",
+      "name": "Public API Gateway 3",
+      "type": "public",
+      "software": "Apache 2.4.49"
+    },
+    {
+      "id": "load_balancer_1",
+      "name": "Load Balancer 1",
+      "type": "public",
+      "software": "F5 BIG-IP"
+    },
+    {
+      "id": "load_balancer_2",
+      "name": "Load Balancer 2",
+      "type": "public",
+      "software": "F5 BIG-IP"
+    },
+    {
+      "id": "vpn_gateway_1",
+      "name": "Corporate VPN 1",
+      "type": "public",
+      "software": "OpenVPN"
+    },
+    {
+      "id": "vpn_gateway_2",
+      "name": "Corporate VPN 2",
+      "type": "public",
+      "software": "OpenVPN"
+    },
+    {
+      "id": "dns_server_1",
+      "name": "External DNS Primary",
+      "type": "public",
+      "software": "BIND 9"
+    },
+    {
+      "id": "dns_server_2",
+      "name": "External DNS Secondary",
+      "type": "public",
+      "software": "BIND 9"
+    },
+    {
+      "id": "waf_1",
+      "name": "Web Application Firewall",
+      "type": "public",
+      "software": "FortiOS"
+    },
+    {
+      "id": "web_app_1",
+      "name": "Web App Server 1",
+      "type": "internal",
+      "software": "Spring Framework"
+    },
+    {
+      "id": "web_app_2",
+      "name": "Web App Server 2",
+      "type": "internal",
+      "software": "Spring Framework"
+    },
+    {
+      "id": "web_app_3",
+      "name": "Web App Server 3",
+      "type": "internal",
+      "software": "Spring Framework"
+    },
+    {
+      "id": "web_app_4",
+      "name": "Web App Server 4",
+      "type": "internal",
+      "software": "Spring Framework"
+    },
+    {
+      "id": "web_app_5",
+      "name": "Web App Server 5",
+      "type": "internal",
+      "software": "Spring Framework"
+    },
+    {
+      "id": "proxy_1",
+      "name": "Reverse Proxy 1",
+      "type": "internal",
+      "software": "Nginx"
+    },
+    {
+      "id": "proxy_2",
+      "name": "Reverse Proxy 2",
+      "type": "internal",
+      "software": "Nginx"
+    },
+    {
+      "id": "proxy_3",
+      "name": "Reverse Proxy 3",
+      "type": "internal",
+      "software": "Nginx"
+    },
+    {
+      "id": "api_internal_1",
+      "name": "Internal Microservice 1",
+      "type": "internal",
+      "software": "Node.js"
+    },
+    {
+      "id": "api_internal_2",
+      "name": "Internal Microservice 2",
+      "type": "internal",
+      "software": "Node.js"
+    },
+    {
+      "id": "api_internal_3",
+      "name": "Internal Microservice 3",
+      "type": "internal",
+      "software": "Node.js"
+    },
+    {
+      "id": "app_server_1",
+      "name": "App Processing Node 1",
+      "type": "internal",
+      "software": "Tomcat"
+    },
+    {
+      "id": "app_server_2",
+      "name": "App Processing Node 2",
+      "type": "internal",
+      "software": "Tomcat"
+    },
+    {
+      "id": "auth_server",
+      "name": "OAuth Identity Broker",
+      "type": "internal",
+      "software": "Keycloak"
+    },
+    {
+      "id": "msg_queue_1",
+      "name": "Message Queue Broker 1",
+      "type": "internal",
+      "software": "Log4j"
+    },
+    {
+      "id": "msg_queue_2",
+      "name": "Message Queue Broker 2",
+      "type": "internal",
+      "software": "Log4j"
+    },
+    {
+      "id": "app_db_sql_1",
+      "name": "Transactional DB Node 1",
+      "type": "internal",
+      "software": "MySQL"
+    },
+    {
+      "id": "app_db_sql_2",
+      "name": "Transactional DB Node 2",
+      "type": "internal",
+      "software": "MySQL"
+    },
+    {
+      "id": "app_db_sql_3",
+      "name": "Transactional DB Node 3",
+      "type": "internal",
+      "software": "MySQL"
+    },
+    {
+      "id": "app_db_cache_1",
+      "name": "Redis Cache Node 1",
+      "type": "internal",
+      "software": "Redis"
+    },
+    {
+      "id": "app_db_cache_2",
+      "name": "Redis Cache Node 2",
+      "type": "internal",
+      "software": "Redis"
+    },
+    {
+      "id": "app_db_cache_3",
+      "name": "Redis Cache Node 3",
+      "type": "internal",
+      "software": "Redis"
+    },
+    {
+      "id": "core_db_node_1",
+      "name": "Core Banking Cluster Node 1",
+      "type": "critical",
+      "software": "PostgreSQL 12.1"
+    },
+    {
+      "id": "core_db_node_2",
+      "name": "Core Banking Cluster Node 2",
+      "type": "critical",
+      "software": "PostgreSQL 12.1"
+    },
+    {
+      "id": "data_warehouse",
+      "name": "Customer Analytics Data Warehouse",
+      "type": "critical",
+      "software": "Oracle Database"
+    },
+    {
+      "id": "backup_server_1",
+      "name": "Primary Backup Vault",
+      "type": "critical",
+      "software": "Veritas NetBackup"
+    },
+    {
+      "id": "backup_server_2",
+      "name": "Secondary Offsite Backup",
+      "type": "critical",
+      "software": "Veritas NetBackup"
+    },
+    {
+      "id": "firewall_1",
+      "name": "Internal Segment Firewall 1",
+      "type": "control",
+      "software": "FortiOS"
+    },
+    {
+      "id": "firewall_2",
+      "name": "Internal Segment Firewall 2",
+      "type": "control",
+      "software": "FortiOS"
+    },
+    {
+      "id": "admin_console_1",
+      "name": "IT Admin Workstation 1",
+      "type": "control",
+      "software": "Windows Server 2019"
+    },
+    {
+      "id": "admin_console_2",
+      "name": "IT Admin Workstation 2",
+      "type": "control",
+      "software": "Windows Server 2019"
+    },
+    {
+      "id": "ad_controller_primary",
+      "name": "Active Directory Primary",
+      "type": "control",
+      "software": "Windows Server 2016"
+    },
+    {
+      "id": "ad_controller_secondary",
+      "name": "Active Directory Replica",
+      "type": "control",
+      "software": "Windows Server 2016"
+    },
+    {
+      "id": "linux_legacy_node",
+      "name": "Unmanaged Legacy Linux System",
+      "type": "internal",
+      "software": "Linux Kernel"
+    },
+    {
+      "id": "swift_terminal",
+      "name": "SWIFT Wire Transfer Terminal",
+      "type": "critical",
+      "software": "Windows 10"
+    },
+    {
+      "id": "payment_gateway",
+      "name": "Payment Clearing Gateway",
+      "type": "critical",
+      "software": "Windows 10"
+    },
+    {
+      "id": "hsms_vault",
+      "name": "Hardware Security Module (HSM)",
+      "type": "critical",
+      "software": "Windows 10"
+    }
+  ],
+  "edges": [
+    {
+      "from": "api_gw_1",
+      "to": "waf_1",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "api_gw_2",
+      "to": "waf_1",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "api_gw_3",
+      "to": "load_balancer_2",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "waf_1",
+      "to": "load_balancer_1",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "waf_1",
+      "to": "load_balancer_2",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "vpn_gateway_1",
+      "to": "ad_controller_primary",
+      "protocol": "LDAP"
+    },
+    {
+      "from": "vpn_gateway_2",
+      "to": "admin_console_1",
+      "protocol": "RDP"
+    },
+    {
+      "from": "load_balancer_1",
+      "to": "web_app_1",
+      "protocol": "HTTP"
+    },
+    {
+      "from": "load_balancer_1",
+      "to": "web_app_2",
+      "protocol": "HTTP"
+    },
+    {
+      "from": "load_balancer_1",
+      "to": "web_app_3",
+      "protocol": "HTTP"
+    },
+    {
+      "from": "load_balancer_1",
+      "to": "proxy_1",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "load_balancer_1",
+      "to": "proxy_2",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "load_balancer_2",
+      "to": "web_app_1",
+      "protocol": "HTTP"
+    },
+    {
+      "from": "load_balancer_2",
+      "to": "web_app_2",
+      "protocol": "HTTP"
+    },
+    {
+      "from": "load_balancer_2",
+      "to": "web_app_3",
+      "protocol": "HTTP"
+    },
+    {
+      "from": "load_balancer_2",
+      "to": "proxy_1",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "load_balancer_2",
+      "to": "proxy_2",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "web_app_1",
+      "to": "web_app_2",
+      "protocol": "TCP"
+    },
+    {
+      "from": "web_app_2",
+      "to": "web_app_3",
+      "protocol": "TCP"
+    },
+    {
+      "from": "web_app_3",
+      "to": "web_app_1",
+      "protocol": "TCP"
+    },
+    {
+      "from": "web_app_1",
+      "to": "auth_server",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "web_app_1",
+      "to": "api_internal_1",
+      "protocol": "REST"
+    },
+    {
+      "from": "web_app_1",
+      "to": "app_server_1",
+      "protocol": "TCP"
+    },
+    {
+      "from": "web_app_1",
+      "to": "app_db_cache_1",
+      "protocol": "Redis"
+    },
+    {
+      "from": "web_app_2",
+      "to": "auth_server",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "web_app_2",
+      "to": "api_internal_1",
+      "protocol": "REST"
+    },
+    {
+      "from": "web_app_2",
+      "to": "app_server_1",
+      "protocol": "TCP"
+    },
+    {
+      "from": "web_app_2",
+      "to": "app_db_cache_1",
+      "protocol": "Redis"
+    },
+    {
+      "from": "web_app_3",
+      "to": "auth_server",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "web_app_3",
+      "to": "api_internal_1",
+      "protocol": "REST"
+    },
+    {
+      "from": "web_app_3",
+      "to": "app_server_1",
+      "protocol": "TCP"
+    },
+    {
+      "from": "web_app_3",
+      "to": "app_db_cache_1",
+      "protocol": "Redis"
+    },
+    {
+      "from": "proxy_1",
+      "to": "api_internal_2",
+      "protocol": "REST"
+    },
+    {
+      "from": "proxy_1",
+      "to": "api_internal_3",
+      "protocol": "REST"
+    },
+    {
+      "from": "proxy_2",
+      "to": "api_internal_2",
+      "protocol": "REST"
+    },
+    {
+      "from": "proxy_2",
+      "to": "api_internal_3",
+      "protocol": "REST"
+    },
+    {
+      "from": "api_internal_1",
+      "to": "msg_queue_1",
+      "protocol": "AMQP"
+    },
+    {
+      "from": "api_internal_2",
+      "to": "msg_queue_2",
+      "protocol": "AMQP"
+    },
+    {
+      "from": "api_internal_3",
+      "to": "app_db_sql_1",
+      "protocol": "MySQL"
+    },
+    {
+      "from": "app_server_1",
+      "to": "app_db_sql_2",
+      "protocol": "MySQL"
+    },
+    {
+      "from": "app_server_2",
+      "to": "app_db_sql_3",
+      "protocol": "MySQL"
+    },
+    {
+      "from": "app_db_sql_1",
+      "to": "data_warehouse",
+      "protocol": "JDBC"
+    },
+    {
+      "from": "app_db_sql_2",
+      "to": "data_warehouse",
+      "protocol": "JDBC"
+    },
+    {
+      "from": "msg_queue_1",
+      "to": "linux_legacy_node",
+      "protocol": "TCP"
+    },
+    {
+      "from": "linux_legacy_node",
+      "to": "core_db_node_1",
+      "protocol": "PostgreSQL"
+    },
+    {
+      "from": "msg_queue_2",
+      "to": "core_db_node_2",
+      "protocol": "PostgreSQL"
+    },
+    {
+      "from": "core_db_node_1",
+      "to": "backup_server_1",
+      "protocol": "TCP"
+    },
+    {
+      "from": "core_db_node_2",
+      "to": "backup_server_2",
+      "protocol": "TCP"
+    },
+    {
+      "from": "admin_console_1",
+      "to": "firewall_1",
+      "protocol": "SSH"
+    },
+    {
+      "from": "admin_console_1",
+      "to": "firewall_2",
+      "protocol": "SSH"
+    },
+    {
+      "from": "admin_console_1",
+      "to": "ad_controller_primary",
+      "protocol": "Kerberos"
+    },
+    {
+      "from": "admin_console_1",
+      "to": "web_app_1",
+      "protocol": "SSH"
+    },
+    {
+      "from": "admin_console_1",
+      "to": "core_db_node_1",
+      "protocol": "SQL"
+    },
+    {
+      "from": "admin_console_1",
+      "to": "data_warehouse",
+      "protocol": "JDBC"
+    },
+    {
+      "from": "admin_console_2",
+      "to": "firewall_1",
+      "protocol": "SSH"
+    },
+    {
+      "from": "admin_console_2",
+      "to": "firewall_2",
+      "protocol": "SSH"
+    },
+    {
+      "from": "admin_console_2",
+      "to": "ad_controller_primary",
+      "protocol": "Kerberos"
+    },
+    {
+      "from": "admin_console_2",
+      "to": "web_app_1",
+      "protocol": "SSH"
+    },
+    {
+      "from": "admin_console_2",
+      "to": "core_db_node_1",
+      "protocol": "SQL"
+    },
+    {
+      "from": "admin_console_2",
+      "to": "data_warehouse",
+      "protocol": "JDBC"
+    },
+    {
+      "from": "ad_controller_primary",
+      "to": "swift_terminal",
+      "protocol": "SMB"
+    },
+    {
+      "from": "ad_controller_secondary",
+      "to": "payment_gateway",
+      "protocol": "SMB"
+    },
+    {
+      "from": "core_db_node_1",
+      "to": "swift_terminal",
+      "protocol": "Proprietary"
+    },
+    {
+      "from": "core_db_node_2",
+      "to": "payment_gateway",
+      "protocol": "Proprietary"
+    },
+    {
+      "from": "swift_terminal",
+      "to": "hsms_vault",
+      "protocol": "TLS"
+    }
+  ]
+}
