@@ -1,0 +1,48 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 14px 26px;
+  border-bottom: 1px solid var(--panel-border);
+  background: linear-gradient(180deg, rgba(14, 19, 46, 0.9), rgba(10, 15, 44, 0.6));
+  backdrop-filter: blur(6px);
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-header__mark {
+  color: var(--accent);
+  font-size: 22px;
+  text-shadow: 0 0 12px var(--accent);
+}
+
+.app-header__brand h1 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text-bright);
+  margin: 0;
+}
+
+.app-header__cursor {
+  color: var(--accent);
+  animation: blink 0.9s step-start infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.app-header__brand p {
+  margin: 2px 0 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+}
