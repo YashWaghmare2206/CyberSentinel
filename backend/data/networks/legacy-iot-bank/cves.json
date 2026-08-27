@@ -1,0 +1,182 @@
+[
+  {
+    "cve_id": "CVE-1999-1368",
+    "cvss_score": 7.5,
+    "description": "AV Option for MS Exchange Server option for InoculateIT 4.53, and possibly other versions, only scans the Inbox folder tree of a Microsoft Exchange server, which could allow viruses to escape detection if a user's rules cause the message to be moved to a different mailbox.",
+    "kev_listed": false,
+    "days_since_published": 9969,
+    "patch_available": false,
+    "node_id": "unpatched_exchange"
+  },
+  {
+    "cve_id": "CVE-1999-0682",
+    "cvss_score": 7.5,
+    "description": "Microsoft Exchange 5.5 allows a remote attacker to relay email (i.e. spam) using encapsulated SMTP addresses, even if the anti-relaying features are enabled.",
+    "kev_listed": false,
+    "days_since_published": 9883,
+    "patch_available": true,
+    "node_id": "unpatched_exchange"
+  },
+  {
+    "cve_id": "CVE-1999-0993",
+    "cvss_score": 7.5,
+    "description": "Modifications to ACLs (Access Control Lists) in Microsoft Exchange  5.5 do not take effect until the directory store cache is refreshed.",
+    "kev_listed": false,
+    "days_since_published": 9754,
+    "patch_available": false,
+    "node_id": "unpatched_exchange"
+  },
+  {
+    "cve_id": "CVE-1999-1043",
+    "cvss_score": 7.5,
+    "description": "Microsoft Exchange Server 5.5 and 5.0 does not properly handle (1) malformed NNTP data, or (2) malformed SMTP data, which allows remote attackers to cause a denial of service (application error).",
+    "kev_listed": false,
+    "days_since_published": 9736,
+    "patch_available": true,
+    "node_id": "unpatched_exchange"
+  },
+  {
+    "cve_id": "CVE-2012-4027",
+    "cvss_score": 7.5,
+    "description": "Directory traversal vulnerability in Tridium Niagara AX Framework allows remote attackers to read files outside of the intended images, nav, and px folders by leveraging incorrect permissions, as demonstrated by reading the config.bog file.",
+    "kev_listed": false,
+    "days_since_published": 5155,
+    "patch_available": true,
+    "node_id": "legacy_hvac_controller"
+  },
+  {
+    "cve_id": "CVE-2012-4028",
+    "cvss_score": 7.5,
+    "description": "Tridium Niagara AX Framework does not properly store credential data, which allows context-dependent attackers to bypass intended access restrictions by using the stored information for authentication.",
+    "kev_listed": false,
+    "days_since_published": 5155,
+    "patch_available": true,
+    "node_id": "legacy_hvac_controller"
+  },
+  {
+    "cve_id": "CVE-2012-3024",
+    "cvss_score": 7.5,
+    "description": "Tridium Niagara AX Framework through 3.6 uses predictable values for (1) session IDs and (2) keys, which might allow remote attackers to bypass authentication via a brute-force attack.",
+    "kev_listed": false,
+    "days_since_published": 5124,
+    "patch_available": true,
+    "node_id": "legacy_hvac_controller"
+  },
+  {
+    "cve_id": "CVE-2012-3025",
+    "cvss_score": 7.5,
+    "description": "The default configuration of Tridium Niagara AX Framework through 3.6 uses a cleartext base64 format for transmission of credentials in cookies, which allows remote attackers to obtain sensitive information by sniffing the network.",
+    "kev_listed": false,
+    "days_since_published": 5124,
+    "patch_available": true,
+    "node_id": "legacy_hvac_controller"
+  },
+  {
+    "cve_id": "CVE-2002-0433",
+    "cvss_score": 7.5,
+    "description": "Pi3Web 2.0.0 allows remote attackers to view restricted files via an HTTP request containing a \"*\" (wildcard or asterisk) character.",
+    "kev_listed": false,
+    "days_since_published": 8798,
+    "patch_available": true,
+    "node_id": "legacy_pbx_system"
+  },
+  {
+    "cve_id": "CVE-2003-0761",
+    "cvss_score": 7.5,
+    "description": "Buffer overflow in the get_msg_text of chan_sip.c in the Session Initiation Protocol (SIP) protocol implementation for Asterisk releases before August 15, 2003, allows remote attackers to execute arbitrary code via certain (1) MESSAGE or (2) INFO requests.",
+    "kev_listed": false,
+    "days_since_published": 8380,
+    "patch_available": true,
+    "node_id": "legacy_pbx_system"
+  },
+  {
+    "cve_id": "CVE-2003-0779",
+    "cvss_score": 7.5,
+    "description": "SQL injection vulnerability in the Call Detail Record (CDR) logging functionality for Asterisk allows remote attackers to execute arbitrary SQL via a CallerID string.",
+    "kev_listed": false,
+    "days_since_published": 8375,
+    "patch_available": true,
+    "node_id": "legacy_pbx_system"
+  },
+  {
+    "cve_id": "CVE-2003-1137",
+    "cvss_score": 7.5,
+    "description": "Charles Steinkuehler sh-httpd 0.3 and 0.4 allows remote attackers to read files or execute arbitrary CGI scripts via a GET request that contains an asterisk (*) wildcard character.",
+    "kev_listed": false,
+    "days_since_published": 8340,
+    "patch_available": true,
+    "node_id": "legacy_pbx_system"
+  },
+  {
+    "cve_id": "CVE-1999-1132",
+    "cvss_score": 7.5,
+    "description": "Windows NT 4.0 allows remote attackers to cause a denial of service (crash) via extra source routing data such as (1) a Routing Information Field (RIF) field with a hop count greater than 7, or (2) a list containing duplicate Token Ring IDs.",
+    "kev_listed": false,
+    "days_since_published": 9736,
+    "patch_available": true,
+    "node_id": "win7_workstation"
+  },
+  {
+    "cve_id": "CVE-2000-1059",
+    "cvss_score": 7.5,
+    "description": "The default configuration of the Xsession file in Mandrake Linux 7.1 and 7.0 bypasses the Xauthority access control mechanism with an \"xhost + localhost\" command, which allows local users to sniff X Windows events and gain privileges.",
+    "kev_listed": false,
+    "days_since_published": 9390,
+    "patch_available": true,
+    "node_id": "win7_workstation"
+  },
+  {
+    "cve_id": "CVE-2000-0929",
+    "cvss_score": 7.5,
+    "description": "Microsoft Windows Media Player 7 allows attackers to cause a denial of service in RTF-enabled email clients via an embedded OCX control that is not closed properly, aka the \"OCX Attachment\" vulnerability.",
+    "kev_listed": false,
+    "days_since_published": 9382,
+    "patch_available": true,
+    "node_id": "win7_workstation"
+  },
+  {
+    "cve_id": "CVE-2000-1112",
+    "cvss_score": 7.5,
+    "description": "Microsoft Windows Media Player 7 executes scripts in custom skin (.WMS) files, which could allow remote attackers to gain privileges via a skin that contains a malicious script, aka the \".WMS Script Execution\" vulnerability.",
+    "kev_listed": false,
+    "days_since_published": 9361,
+    "patch_available": true,
+    "node_id": "win7_workstation"
+  },
+  {
+    "cve_id": "CVE-1999-1552",
+    "cvss_score": 7.5,
+    "description": "dpsexec (DPS Server) when running under XDM in IBM AIX 3.2.5 and earlier does not properly check privileges, which allows local users to overwrite arbitrary files and gain privileges.",
+    "kev_listed": false,
+    "days_since_published": 11726,
+    "patch_available": true,
+    "node_id": "mainframe_terminal"
+  },
+  {
+    "cve_id": "CVE-1999-1486",
+    "cvss_score": 7.5,
+    "description": "sadc in IBM AIX 4.1 through 4.3, when called from programs such as timex that are setgid adm, allows local users to overwrite arbitrary files via a symlink attack.",
+    "kev_listed": false,
+    "days_since_published": 10410,
+    "patch_available": true,
+    "node_id": "mainframe_terminal"
+  },
+  {
+    "cve_id": "CVE-1999-1403",
+    "cvss_score": 7.5,
+    "description": "IBM/Tivoli OPC Tracker Agent version 2 release 1 creates files, directories, and IPC message queues with insecure permissions (world-readable and world-writable), which could allow local users to disrupt operations and possibly gain privileges by modifying or deleting files.",
+    "kev_listed": false,
+    "days_since_published": 10191,
+    "patch_available": true,
+    "node_id": "mainframe_terminal"
+  },
+  {
+    "cve_id": "CVE-1999-1404",
+    "cvss_score": 7.5,
+    "description": "IBM/Tivoli OPC Tracker Agent version 2 release 1 allows remote attackers to cause a denial of service (resource exhaustion) via malformed data to the localtracker client port (5011), which prevents the connection from being closed properly.",
+    "kev_listed": false,
+    "days_since_published": 10191,
+    "patch_available": true,
+    "node_id": "mainframe_terminal"
+  }
+]

@@ -1,0 +1,48 @@
+:root {
+  --bg-deep: #0A0F2C;
+  --panel-bg: rgba(17, 23, 56, 0.55);
+  --panel-bg-raised: rgba(24, 31, 68, 0.75);
+  --panel-bg-hover: rgba(30, 38, 82, 0.85);
+  --panel-border: #232C5C;
+  --text-bright: #EDF1FF;
+  --text-dim: #8A93C4;
+  --text-faint: #5C6494;
+  --accent: #4FA3FF;
+
+  --font-display: "Rajdhani", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-display);
+  background:
+    radial-gradient(1100px 620px at 12% -10%, rgba(79, 163, 255, 0.10), transparent 60%),
+    radial-gradient(900px 560px at 100% 0%, rgba(231, 76, 60, 0.08), transparent 55%),
+    var(--bg-deep);
+  color: var(--text-bright);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: #2A3560;
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover { background: #384483; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
