@@ -6,7 +6,12 @@
     "kev_listed": false,
     "days_since_published": 10587,
     "patch_available": false,
-    "node_id": "teller_workstation_1"
+    "node_id": "teller_workstation_1",
+    "remediation": {
+      "issue": "HP-UX 9.x and 10.x running X windows may allow local attackers to gain privileges via (1) vuefile, (2) vuepad, (3) dtfile, or (4) dtpad, which do not authenticate users. (affects Windows 10 on Hardware Security Module (HSM)).",
+      "impact": "Exploiting CVE-1999-1133 here hands the attacker direct access to a critical, high-blast-radius asset \u2014 the kind of foothold that turns a breach into a material incident, representing significant risk at CVSS 7.5.",
+      "fix": "No specific patch string is on file for CVE-1999-1133 \u2014 check the vendor's advisory for Windows 10 and apply the latest security update immediately. Until patched, apply compensating controls (network segmentation, WAF/ACL rules, or disabling the vulnerable feature) to reduce exposure."
+    }
   },
   {
     "cve_id": "CVE-2002-2275",
@@ -15,7 +20,12 @@
     "kev_listed": false,
     "days_since_published": 8640,
     "patch_available": false,
-    "node_id": "teller_workstation_1"
+    "node_id": "teller_workstation_1",
+    "remediation": {
+      "issue": "Fortres 101 4.1 allows local users to bypass Fortres by pressing the Windows and \"F\" key together for 30 seconds, which opens multiple windows and eventually causes explorer.exe to crash, which then opens an unrestricted explorer.exe. (affects Windows 10 on Hardware Security Module (HSM)).",
+      "impact": "Exploiting CVE-2002-2275 here hands the attacker direct access to a critical, high-blast-radius asset \u2014 the kind of foothold that turns a breach into a material incident, representing significant risk at CVSS 7.5.",
+      "fix": "No specific patch string is on file for CVE-2002-2275 \u2014 check the vendor's advisory for Windows 10 and apply the latest security update immediately. Until patched, apply compensating controls (network segmentation, WAF/ACL rules, or disabling the vulnerable feature) to reduce exposure."
+    }
   },
   {
     "cve_id": "CVE-2003-0837",
@@ -24,7 +34,12 @@
     "kev_listed": false,
     "days_since_published": 8319,
     "patch_available": true,
-    "node_id": "teller_workstation_1"
+    "node_id": "teller_workstation_1",
+    "remediation": {
+      "issue": "Stack-based buffer overflow in IBM DB2 Universal Data Base 7.2 for Windows, before Fixpak 10a, allows attackers with \"Connect\" privileges to execute arbitrary code via the INVOKE command. (affects Windows 10 on Hardware Security Module (HSM)).",
+      "impact": "Exploiting CVE-2003-0837 here hands the attacker direct access to a critical, high-blast-radius asset \u2014 the kind of foothold that turns a breach into a material incident, representing significant risk at CVSS 7.5.",
+      "fix": "No specific patch string is on file for CVE-2003-0837 \u2014 check the vendor's advisory for Windows 10 and apply the latest security update immediately. Until patched, apply compensating controls (network segmentation, WAF/ACL rules, or disabling the vulnerable feature) to reduce exposure."
+    }
   },
   {
     "cve_id": "CVE-2004-0090",
@@ -33,7 +48,12 @@
     "kev_listed": false,
     "days_since_published": 7909,
     "patch_available": true,
-    "node_id": "teller_workstation_1"
+    "node_id": "teller_workstation_1",
+    "remediation": {
+      "issue": "Unknown vulnerability in Windows File Sharing for Mac OS X 10.1.5 through 10.3.2 does not \"shutdown properly,\" which has unknown impact and attack vectors. (affects Windows 10 on Hardware Security Module (HSM)).",
+      "impact": "Exploiting CVE-2004-0090 here hands the attacker direct access to a critical, high-blast-radius asset \u2014 the kind of foothold that turns a breach into a material incident, representing significant risk at CVSS 7.5.",
+      "fix": "No specific patch string is on file for CVE-2004-0090 \u2014 check the vendor's advisory for Windows 10 and apply the latest security update immediately. Until patched, apply compensating controls (network segmentation, WAF/ACL rules, or disabling the vulnerable feature) to reduce exposure."
+    }
   },
   {
     "cve_id": "CVE-1999-1133",
@@ -42,7 +62,12 @@
     "kev_listed": false,
     "days_since_published": 10587,
     "patch_available": false,
-    "node_id": "teller_workstation_2"
+    "node_id": "teller_workstation_2",
+    "remediation": {
+      "issue": "HP-UX 9.x and 10.x running X windows may allow local attackers to gain privileges via (1) vuefile, (2) vuepad, (3) dtfile, or (4) dtpad, which do not authenticate users. (affects Windows 10 on Hardware Security Module (HSM)).",
+      "impact": "Exploiting CVE-1999-1133 here hands the attacker direct access to a critical, high-blast-radius asset \u2014 the kind of foothold that turns a breach into a material incident, representing significant risk at CVSS 7.5.",
+      "fix": "No specific patch string is on file for CVE-1999-1133 \u2014 check the vendor's advisory for Windows 10 and apply the latest security update immediately. Until patched, apply compensating controls (network segmentation, WAF/ACL rules, or disabling the vulnerable feature) to reduce exposure."
+    }
   },
   {
     "cve_id": "CVE-2002-2275",
@@ -51,7 +76,12 @@
     "kev_listed": false,
     "days_since_published": 8640,
     "patch_available": false,
-    "node_id": "teller_workstation_2"
+    "node_id": "teller_workstation_2",
+    "remediation": {
+      "issue": "Fortres 101 4.1 allows local users to bypass Fortres by pressing the Windows and \"F\" key together for 30 seconds, which opens multiple windows and eventually causes explorer.exe to crash, which then opens an unrestricted explorer.exe. (affects Windows 10 on Hardware Security Module (HSM)).",
+      "impact": "Exploiting CVE-2002-2275 here hands the attacker direct access to a critical, high-blast-radius asset \u2014 the kind of foothold that turns a breach into a material incident, representing significant risk at CVSS 7.5.",
+      "fix": "No specific patch string is on file for CVE-2002-2275 \u2014 check the vendor's advisory for Windows 10 and apply the latest security update immediately. Until patched, apply compensating controls (network segmentation, WAF/ACL rules, or disabling the vulnerable feature) to reduce exposure."
+    }
   },
   {
     "cve_id": "CVE-2003-0837",
@@ -60,7 +90,12 @@
     "kev_listed": false,
     "days_since_published": 8319,
     "patch_available": true,
-    "node_id": "teller_workstation_2"
+    "node_id": "teller_workstation_2",
+    "remediation": {
+      "issue": "Stack-based buffer overflow in IBM DB2 Universal Data Base 7.2 for Windows, before Fixpak 10a, allows attackers with \"Connect\" privileges to execute arbitrary code via the INVOKE command. (affects Windows 10 on Hardware Security Module (HSM)).",
+      "impact": "Exploiting CVE-2003-0837 here hands the attacker direct access to a critical, high-blast-radius asset \u2014 the kind of foothold that turns a breach into a material incident, representing significant risk at CVSS 7.5.",
+      "fix": "No specific patch string is on file for CVE-2003-0837 \u2014 check the vendor's advisory for Windows 10 and apply the latest security update immediately. Until patched, apply compensating controls (network segmentation, WAF/ACL rules, or disabling the vulnerable feature) to reduce exposure."
+    }
   },
   {
     "cve_id": "CVE-2004-0090",
@@ -69,7 +104,12 @@
     "kev_listed": false,
     "days_since_published": 7909,
     "patch_available": true,
-    "node_id": "teller_workstation_2"
+    "node_id": "teller_workstation_2",
+    "remediation": {
+      "issue": "Unknown vulnerability in Windows File Sharing for Mac OS X 10.1.5 through 10.3.2 does not \"shutdown properly,\" which has unknown impact and attack vectors. (affects Windows 10 on Hardware Security Module (HSM)).",
+      "impact": "Exploiting CVE-2004-0090 here hands the attacker direct access to a critical, high-blast-radius asset \u2014 the kind of foothold that turns a breach into a material incident, representing significant risk at CVSS 7.5.",
+      "fix": "No specific patch string is on file for CVE-2004-0090 \u2014 check the vendor's advisory for Windows 10 and apply the latest security update immediately. Until patched, apply compensating controls (network segmentation, WAF/ACL rules, or disabling the vulnerable feature) to reduce exposure."
+    }
   },
   {
     "cve_id": "CVE-2018-8320",
@@ -78,7 +118,12 @@
     "kev_listed": false,
     "days_since_published": 2878,
     "patch_available": true,
-    "node_id": "branch_file_server"
+    "node_id": "branch_file_server",
+    "remediation": {
+      "issue": "A security feature bypass vulnerability exists in DNS Global Blocklist feature, aka \"Windows DNS Security Feature Bypass Vulnerability.\" This affects Windows Server 2012 R2, Windows Server 2008, Windows Server 2012, Windows Server 2019,... (affects Windows Server 2019 on IT Admin Workstation 2).",
+      "impact": "Exploiting CVE-2018-8320 here hands the attacker control-plane access (identity, firewall, or admin tooling), letting the attacker manipulate trust for the rest of the network, representing moderate risk at CVSS 4.3.",
+      "fix": "No specific patch string is on file for CVE-2018-8320 \u2014 check the vendor's advisory for Windows Server 2019 and apply the latest security update immediately. Until patched, apply compensating controls (network segmentation, WAF/ACL rules, or disabling the vulnerable feature) to reduce exposure."
+    }
   },
   {
     "cve_id": "CVE-2018-8330",
@@ -87,7 +132,12 @@
     "kev_listed": false,
     "days_since_published": 2878,
     "patch_available": true,
-    "node_id": "branch_file_server"
+    "node_id": "branch_file_server",
+    "remediation": {
+      "issue": "An information disclosure vulnerability exists when the Windows kernel improperly handles objects in memory, aka \"Windows Kernel Information Disclosure Vulnerability.\" This affects Windows 7, Windows Server 2012 R2, Windows RT 8.1, Windo... (affects Windows Server 2019 on IT Admin Workstation 2).",
+      "impact": "Exploiting CVE-2018-8330 here hands the attacker control-plane access (identity, firewall, or admin tooling), letting the attacker manipulate trust for the rest of the network, representing moderate risk at CVSS 5.5.",
+      "fix": "No specific patch string is on file for CVE-2018-8330 \u2014 check the vendor's advisory for Windows Server 2019 and apply the latest security update immediately. Until patched, apply compensating controls (network segmentation, WAF/ACL rules, or disabling the vulnerable feature) to reduce exposure."
+    }
   },
   {
     "cve_id": "CVE-2018-8333",
@@ -96,7 +146,12 @@
     "kev_listed": false,
     "days_since_published": 2878,
     "patch_available": true,
-    "node_id": "branch_file_server"
+    "node_id": "branch_file_server",
+    "remediation": {
+      "issue": "An Elevation of Privilege vulnerability exists in Filter Manager when it improperly handles objects in memory, aka \"Microsoft Filter Manager Elevation Of Privilege Vulnerability.\" This affects Windows 7, Windows Server 2012 R2, Windows R... (affects Windows Server 2019 on IT Admin Workstation 2).",
+      "impact": "Exploiting CVE-2018-8333 here hands the attacker control-plane access (identity, firewall, or admin tooling), letting the attacker manipulate trust for the rest of the network, representing significant risk at CVSS 7.0.",
+      "fix": "No specific patch string is on file for CVE-2018-8333 \u2014 check the vendor's advisory for Windows Server 2019 and apply the latest security update immediately. Until patched, apply compensating controls (network segmentation, WAF/ACL rules, or disabling the vulnerable feature) to reduce exposure."
+    }
   },
   {
     "cve_id": "CVE-2018-8411",
@@ -105,7 +160,12 @@
     "kev_listed": false,
     "days_since_published": 2878,
     "patch_available": true,
-    "node_id": "branch_file_server"
+    "node_id": "branch_file_server",
+    "remediation": {
+      "issue": "An elevation of privilege vulnerability exists when NTFS improperly checks access, aka \"NTFS Elevation of Privilege Vulnerability.\" This affects Windows 7, Windows Server 2012 R2, Windows RT 8.1, Windows Server 2008, Windows Server 2019,... (affects Windows Server 2019 on IT Admin Workstation 2).",
+      "impact": "Exploiting CVE-2018-8411 here hands the attacker control-plane access (identity, firewall, or admin tooling), letting the attacker manipulate trust for the rest of the network, representing significant risk at CVSS 7.8.",
+      "fix": "No specific patch string is on file for CVE-2018-8411 \u2014 check the vendor's advisory for Windows Server 2019 and apply the latest security update immediately. Until patched, apply compensating controls (network segmentation, WAF/ACL rules, or disabling the vulnerable feature) to reduce exposure."
+    }
   },
   {
     "cve_id": "CVE-2013-4977",
@@ -114,7 +174,12 @@
     "kev_listed": false,
     "days_since_published": 4560,
     "patch_available": false,
-    "node_id": "vault_iot_camera"
+    "node_id": "vault_iot_camera",
+    "remediation": {
+      "issue": "Buffer overflow in the RTSP Packet Handler in Hikvision DS-2CD7153-E IP camera with firmware 4.1.0 b130111 (Jan 2013), and possibly other devices, allows remote attackers to cause a denial of service (device crash and reboot) and possibly execute arbitrary code via a long string in the Range header field in an RTSP transaction. (affects host vault_iot_camera via CVE-2013-4977).",
+      "impact": "Exploiting CVE-2013-4977 (CVSS 7.5, HIGH) enables privilege escalation or lateral pivot through this host.",
+      "fix": "Apply vendor security update. Priority: Fix This Week. Implement strict ingress filtering and monitor system logs until patched."
+    }
   },
   {
     "cve_id": "CVE-2014-4880",
@@ -123,7 +188,12 @@
     "kev_listed": false,
     "days_since_published": 4280,
     "patch_available": false,
-    "node_id": "vault_iot_camera"
+    "node_id": "vault_iot_camera",
+    "remediation": {
+      "issue": "Buffer overflow in Hikvision DVR DS-7204 Firmware 2.2.10 build 131009, and other models and versions, allows remote attackers to execute arbitrary code via an RTSP PLAY request with a long Authorization header. (affects host vault_iot_camera via CVE-2014-4880).",
+      "impact": "Exploiting CVE-2014-4880 (CVSS 7.5, HIGH) enables privilege escalation or lateral pivot through this host.",
+      "fix": "Apply vendor security update. Priority: Fix This Week. Implement strict ingress filtering and monitor system logs until patched."
+    }
   },
   {
     "cve_id": "CVE-2015-4407",
@@ -132,7 +202,12 @@
     "kev_listed": false,
     "days_since_published": 3454,
     "patch_available": true,
-    "node_id": "vault_iot_camera"
+    "node_id": "vault_iot_camera",
+    "remediation": {
+      "issue": "Buffer overflow on Hikvision NVR DS-76xxNI-E1/2 and DS-77xxxNI-E4 devices before 3.4.0 allows remote authenticated users to cause a denial of service (service interruption) via a crafted HTTP request, aka the PSIA issue. (affects host vault_iot_camera via CVE-2015-4407).",
+      "impact": "Exploiting CVE-2015-4407 (CVSS 6.5, HIGH) enables privilege escalation or lateral pivot through this host.",
+      "fix": "Apply vendor security update. Priority: Monitor. Implement strict ingress filtering and monitor system logs until patched."
+    }
   },
   {
     "cve_id": "CVE-2015-4408",
@@ -141,7 +216,12 @@
     "kev_listed": false,
     "days_since_published": 3454,
     "patch_available": true,
-    "node_id": "vault_iot_camera"
+    "node_id": "vault_iot_camera",
+    "remediation": {
+      "issue": "Buffer overflow on Hikvision NVR DS-76xxNI-E1/2 and DS-77xxxNI-E4 devices before 3.4.0 allows remote authenticated users to cause a denial of service (service interruption) via a crafted HTTP request, aka the ISAPI issue. (affects host vault_iot_camera via CVE-2015-4408).",
+      "impact": "Exploiting CVE-2015-4408 (CVSS 6.5, HIGH) enables privilege escalation or lateral pivot through this host.",
+      "fix": "Apply vendor security update. Priority: Monitor. Implement strict ingress filtering and monitor system logs until patched."
+    }
   },
   {
     "cve_id": "CVE-2000-0929",
@@ -150,7 +230,12 @@
     "kev_listed": false,
     "days_since_published": 9382,
     "patch_available": true,
-    "node_id": "atm_controller"
+    "node_id": "atm_controller",
+    "remediation": {
+      "issue": "Microsoft Windows Media Player 7 allows attackers to cause a denial of service in RTF-enabled email clients via an embedded OCX control that is not closed properly, aka the \"OCX Attachment\" vulnerability. (affects host atm_controller via CVE-2000-0929).",
+      "impact": "Exploiting CVE-2000-0929 (CVSS 7.5, HIGH) enables privilege escalation or lateral pivot through this host.",
+      "fix": "Apply vendor security update. Priority: Fix This Week. Implement strict ingress filtering and monitor system logs until patched."
+    }
   },
   {
     "cve_id": "CVE-2003-1357",
@@ -159,7 +244,12 @@
     "kev_listed": false,
     "days_since_published": 8275,
     "patch_available": false,
-    "node_id": "atm_controller"
+    "node_id": "atm_controller",
+    "remediation": {
+      "issue": "ProxyView has a default administrator password of Administrator for Embedded Windows NT, which allows remote attackers to gain access. (affects host atm_controller via CVE-2003-1357).",
+      "impact": "Exploiting CVE-2003-1357 (CVSS 7.5, HIGH) enables privilege escalation or lateral pivot through this host.",
+      "fix": "Apply vendor security update. Priority: Fix This Week. Implement strict ingress filtering and monitor system logs until patched."
+    }
   },
   {
     "cve_id": "CVE-2004-2291",
@@ -168,7 +258,12 @@
     "kev_listed": false,
     "days_since_published": 7909,
     "patch_available": true,
-    "node_id": "atm_controller"
+    "node_id": "atm_controller",
+    "remediation": {
+      "issue": "Microsoft Windows Internet Explorer 5.5 and 6.0 allows remote attackers to execute arbitrary code via an embedded script that uses Shell Helper objects and a shortcut (link) to execute the target script. (affects host atm_controller via CVE-2004-2291).",
+      "impact": "Exploiting CVE-2004-2291 (CVSS 7.5, HIGH) enables privilege escalation or lateral pivot through this host.",
+      "fix": "Apply vendor security update. Priority: Fix This Week. Implement strict ingress filtering and monitor system logs until patched."
+    }
   },
   {
     "cve_id": "CVE-2005-2087",
@@ -177,6 +272,11 @@
     "kev_listed": false,
     "days_since_published": 7723,
     "patch_available": true,
-    "node_id": "atm_controller"
+    "node_id": "atm_controller",
+    "remediation": {
+      "issue": "Internet Explorer 5.01 SP4 up to 6 on various Windows operating systems, including IE 6.0.2900.2180 on Windows XP, allows remote attackers to cause a denial of service (application crash) and possibly execute arbitrary code via a web page with embedded CLSIDs that reference certain COM objects that are not ActiveX controls, as demonstrated using the JVIEW Profiler (Javaprxy.dll) (affects host atm_controller via CVE-2005-2087).",
+      "impact": "Exploiting CVE-2005-2087 (CVSS 7.5, HIGH) enables privilege escalation or lateral pivot through this host.",
+      "fix": "Apply vendor security update. Priority: Fix This Week. Implement strict ingress filtering and monitor system logs until patched."
+    }
   }
 ]

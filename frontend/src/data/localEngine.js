@@ -85,7 +85,10 @@ export function buildNarrative(pathResult, entryLabel, targetLabel) {
   return lines.join("\n\n");
 }
 
-/** Builds the auto-fix remediation text for a given computed path. */
+/**
+ * Builds the auto-fix remediation text for a given computed path.
+ * Kept as a plain-text fallback.
+ */
 export function buildFixPlan(pathResult) {
   const { nodes } = pathResult;
   const lines = [];
@@ -104,37 +107,89 @@ export function buildFixPlan(pathResult) {
 }
 
 /**
- * Computes the real attack path (Person 1's algorithm) and streams the
- * narrative token by token, mimicking the shape of the real /simulate SSE
- * stream: {type: "path"} then {type: "token"}* then {type: "done"}.
+ * Task 1: per-node remediation object, pulled from the node's worst CVE.
+ * SafetyCard.jsx renders this structured { issue, impact, fix } content.
  */
-export async function* localSimulateStream(entryNode, targetNode, entryLabel, targetLabel) {
-  const result = findAttackPaths(entryNode, targetNode);
+export function buildNodeFix(node) {
+  const cve = topCve(node);
+  if (!cve) {
+    return {
+      issue: "No CVE is mapped to this host.",
+      impact: "Used only as a pivot/transit hop via its trust relationship with the previous node.",
+      fix: "No patch required here — verify segmentation and logging are still enforced on this hop.",
+    };
+  }
+  if (cve.remediation?.issue) {
+    return {
+      cve_id: cve.cve_id,
+      cvss_score: cve.cvss_score,
+      ...cve.remediation,
+    };
+  }
+  const urgency = cve.cvss_score >= 9 ? "Fix Now" : cve.cvss_score >= 7 ? "Fix This Week" : "Monitor";
+  return {
+    cve_id: cve.cve_id,
+    cvss_score: cve.cvss_score,
+    issue: `${cve.cve_id} (CVSS ${cve.cvss_score.toFixed(1)}, ${cve.severity}): ${(cve.description || "").split(". ")[0]}.`,
+    impact: `Exploiting this at ${node.name} advances the attacker along the kill chain via ${node.software}.`,
+    fix: `${cve.patch || "Apply the vendor patch"}. Priority: ${urgency}.`,
+  };
+}
+
+/**
+ * Computes the real attack path and streams the narrative token by token.
+ * Task 2: accepts an options bag so the caller can switch between
+ * ranked paths (pathIndex) and weighting modes.
+ */
+export async function* localSimulateStream(
+  entryNode,
+  targetNode,
+  entryLabel,
+  targetLabel,
+  options = {}
+) {
+  const { pathIndex = 0, networkId = "enterprise-bank", algorithm = "dijkstra", weightingMode = "static" } = options;
+  const result = findAttackPaths(entryNode, targetNode, networkId, algorithm, weightingMode);
   if ("error" in result) {
     yield { type: "error", data: result.error };
     yield { type: "done" };
     return;
   }
-  const pathResult = result[0];
-  yield { type: "path", data: pathResult };
+  yield { type: "paths", data: result }; // full ranked set
+  const idx = Math.max(0, Math.min(result.length - 1, pathIndex));
+  const pathResult = result[idx];
+  yield { type: "path", data: pathResult }; // selected path
   await sleep(300);
 
   const narrative = buildNarrative(pathResult, entryLabel, targetLabel);
   const words = narrative.split(/(\s+)/);
   for (const word of words) {
     yield { type: "token", data: word };
-    await sleep(14 + Math.random() * 18);
+    await sleep(55 + Math.random() * 30);
   }
   yield { type: "done" };
 }
 
-/** Streams the auto-fix plan for an already-computed path. */
+/**
+ * Task 1: streams one node_fix event per node in path order,
+ * so SafetyCard.jsx can reveal cards one at a time.
+ */
 export async function* localFixStream(pathResult) {
+  const { nodes } = pathResult;
+  if (nodes && Array.isArray(nodes)) {
+    for (const node of nodes) {
+      yield { type: "node_fix", node_id: node.id, data: buildNodeFix(node) };
+      await sleep(320 + Math.random() * 120);
+    }
+  }
+  
+  // Also yield legacy fix_token stream for text fallback
   const fixPlan = buildFixPlan(pathResult);
   const words = fixPlan.split(/(\s+)/);
   for (const word of words) {
     yield { type: "fix_token", data: word };
-    await sleep(8 + Math.random() * 14);
+    await sleep(6 + Math.random() * 10);
   }
   yield { type: "done" };
 }
+

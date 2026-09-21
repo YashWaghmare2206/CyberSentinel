@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ForceGraph3D from "3d-force-graph";
 import SpriteText from "three-spritetext";
-import { buildGraph } from "../data/graphEngine";
+import { buildGraph, getMitreAttackMapping } from "../data/graphEngine";
+import PlaybackControls from "./PlaybackControls";
 import "./NetworkGraph.css";
 
-const graph = buildGraph();
 
 // Continuous risk gradient (green → yellow → orange → red) instead of a
 // flat per-type color — with real CVSS scores ranging from 0 to 10 across
@@ -51,18 +51,23 @@ function nodeRadius(n) {
 
 function countCompromisedSteps(narrative, pathLength) {
   if (!narrative) return 0;
-  const matches = narrative.match(/Step\s+(\d+)/gi) || [];
-  const maxStep = matches.reduce((max, m) => {
+  const stepMatches = narrative.match(/Step\s+(\d+)/gi) || [];
+  const numMatches = narrative.match(/(?:^|\n)\s*(\d+)\.\s+/g) || [];
+
+  let maxStep = 0;
+  for (const m of stepMatches) {
     const n = parseInt(m.replace(/\D/g, ""), 10);
-    return Number.isFinite(n) ? Math.max(max, n) : max;
-  }, 0);
+    if (Number.isFinite(n) && n > maxStep) maxStep = n;
+  }
+  for (const m of numMatches) {
+    const n = parseInt(m.replace(/\D/g, ""), 10);
+    if (Number.isFinite(n) && n > maxStep) maxStep = n;
+  }
   return Math.min(maxStep, pathLength);
 }
 
-// Builds the static { nodes, links } graph data once — node/link identity
-// stays stable across re-renders so 3d-force-graph doesn't re-run the
-// force simulation from scratch on every narrative token.
-function buildGraphData() {
+// Builds the static { nodes, links } graph data
+function buildGraphData(graph) {
   const nodes = [...graph.nodes.values()].map((n) => ({
     id: n.id,
     name: n.name,
@@ -79,23 +84,143 @@ function buildGraphData() {
   return { nodes, links };
 }
 
-export default function NetworkGraph({ attackPath, narrative, status, STATUS }) {
+export default function NetworkGraph({
+  attackPath,
+  allAttackPaths = [],
+  narrative,
+  status,
+  STATUS,
+  networkId = "enterprise-bank",
+  weightingMode = "static",
+  isolatedNodes = new Set(),
+  toggleIsolateNode,
+  containmentMessage,
+}) {
+  const graph = useMemo(() => buildGraph(networkId, weightingMode), [networkId, weightingMode]);
+
   const containerRef = useRef(null);
   const fgRef = useRef(null);
   const hasFitRef = useRef(false);
-  const graphData = useMemo(buildGraphData, []);
+  const graphData = useMemo(() => buildGraphData(graph), [graph]);
+
+  // Deliberate, calm hop progression with interactive playback HUD & speed options
+  const [liveHopIndex, setLiveHopIndex] = useState(0);
+  const [isHopsAnimating, setIsHopsAnimating] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [selectedNode, setSelectedNode] = useState(null);
+  const animTimerRef = useRef(null);
+
+  useEffect(() => {
+    if (status === STATUS.IDLE || status === STATUS.ERROR || !attackPath?.path?.length) {
+      if (animTimerRef.current) {
+        clearInterval(animTimerRef.current);
+        animTimerRef.current = null;
+      }
+      setLiveHopIndex(0);
+      setIsHopsAnimating(false);
+      return;
+    }
+
+    // Start deliberate hop progression when simulation starts
+    if (status === STATUS.SIMULATING && !isHopsAnimating && liveHopIndex === 0) {
+      setLiveHopIndex(1);
+      setIsHopsAnimating(true);
+      setIsPlaying(true);
+      const totalHops = attackPath.path.length;
+
+      if (animTimerRef.current) clearInterval(animTimerRef.current);
+
+      const delay = Math.round(2600 / playbackSpeed);
+      animTimerRef.current = setInterval(() => {
+        setLiveHopIndex((prev) => {
+          if (!isPlaying) return prev;
+          if (prev < totalHops) {
+            return prev + 1;
+          }
+          if (animTimerRef.current) {
+            clearInterval(animTimerRef.current);
+            animTimerRef.current = null;
+          }
+          setIsHopsAnimating(false);
+          return totalHops;
+        });
+      }, delay);
+    }
+  }, [status, attackPath, STATUS, isHopsAnimating, liveHopIndex, playbackSpeed, isPlaying]);
+
+  // Dynamic speed adjustment & play/pause listener during animation
+  useEffect(() => {
+    if (!isHopsAnimating || !attackPath?.path?.length) return;
+    if (animTimerRef.current) clearInterval(animTimerRef.current);
+
+    if (!isPlaying) return;
+
+    const totalHops = attackPath.path.length;
+    const delay = Math.round(2600 / playbackSpeed);
+
+    animTimerRef.current = setInterval(() => {
+      setLiveHopIndex((prev) => {
+        if (prev < totalHops) return prev + 1;
+        if (animTimerRef.current) {
+          clearInterval(animTimerRef.current);
+          animTimerRef.current = null;
+        }
+        setIsHopsAnimating(false);
+        return totalHops;
+      });
+    }, delay);
+
+    return () => {
+      if (animTimerRef.current) clearInterval(animTimerRef.current);
+    };
+  }, [isPlaying, playbackSpeed, isHopsAnimating, attackPath]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (animTimerRef.current) clearInterval(animTimerRef.current);
+    };
+  }, []);
+
+  // When graphData changes (user changed network), update the engine geometry and fit to view
+  useEffect(() => {
+    if (fgRef.current) {
+      fgRef.current.graphData(graphData);
+      setTimeout(() => {
+        fgRef.current?.zoomToFit(600, 60);
+      }, 250);
+    }
+  }, [graphData]);
 
   const pathSet = useMemo(() => new Set(attackPath?.path ?? []), [attackPath]);
-  const compromisedCount = useMemo(
-    () => countCompromisedSteps(narrative, attackPath?.path?.length ?? 0),
-    [narrative, attackPath]
-  );
+
+  const compromisedCount = useMemo(() => {
+    if (!attackPath?.path?.length) return 0;
+    const pathLen = attackPath.path.length;
+    // While hop animation is progressing, follow the live hop index exactly
+    if (isHopsAnimating) {
+      return Math.min(Math.max(liveHopIndex, 1), pathLen);
+    }
+    // When simulation is done and hop animation has completed, all hops are compromised
+    if (status === STATUS.COMPLETE || status === STATUS.NARRATIVE_DONE || status === STATUS.FIXING) {
+      return pathLen;
+    }
+    return Math.max(liveHopIndex, 1);
+  }, [attackPath, status, STATUS, liveHopIndex, isHopsAnimating]);
+
   const settledSet = useMemo(() => {
-    if (!attackPath) return new Set();
-    return new Set(attackPath.path.slice(0, Math.max(compromisedCount - 1, 0)));
+    if (!attackPath?.path?.length) return new Set();
+    const isDone = !isHopsAnimating && (status === STATUS.COMPLETE || status === STATUS.NARRATIVE_DONE || status === STATUS.FIXING);
+    const count = isDone ? attackPath.path.length : Math.max(compromisedCount - 1, 0);
+    return new Set(attackPath.path.slice(0, count));
+  }, [attackPath, compromisedCount, status, STATUS, isHopsAnimating]);
+
+  const activeNodeId = useMemo(() => {
+    if (!attackPath?.path?.length) return null;
+    const idx = Math.min(Math.max(compromisedCount - 1, 0), attackPath.path.length - 1);
+    return attackPath.path[idx];
   }, [attackPath, compromisedCount]);
-  const activeNodeId =
-    attackPath?.path?.[Math.max(compromisedCount - 1, 0)] ?? attackPath?.path?.[0];
 
   const isSimulating =
     status === STATUS.SIMULATING ||
@@ -175,6 +300,13 @@ export default function NetworkGraph({ attackPath, narrative, status, STATUS }) 
       fg.controls().autoRotate = false;
     });
 
+    fg.onNodeClick((node) => {
+      setSelectedNode(node);
+    });
+    fg.onBackgroundClick(() => {
+      setSelectedNode(null);
+    });
+
     fgRef.current = fg;
 
     const handleResize = () => {
@@ -198,66 +330,124 @@ export default function NetworkGraph({ attackPath, narrative, status, STATUS }) 
     if (!fg) return;
 
     fg.nodeColor((n) => {
+      if (isolatedNodes && isolatedNodes.has(n.id)) return "#00f0ff"; // Quarantined cyan!
       if (!isSimulating) return riskGradient(n.risk);
       if (!pathSet.has(n.id)) return "#232C52"; // dimmed / off-path
       if (settledSet.has(n.id) || n.id === activeNodeId) return "#E74C3C"; // compromised
       return "#F39C12"; // still ahead on the path, not yet reached
     });
 
+    // Pre-compute alternative edges
+    const altEdges = new Set();
+    if (isSimulating && allAttackPaths && allAttackPaths.length > 1) {
+      for (let i = 1; i < allAttackPaths.length; i++) {
+        const altPath = allAttackPaths[i].path;
+        if (!altPath) continue;
+        for (let j = 0; j < altPath.length - 1; j++) {
+          altEdges.add(`${altPath[j]}-${altPath[j+1]}`);
+        }
+      }
+    }
+
     fg.linkColor((l) => {
       const fromId = typeof l.source === "object" ? l.source.id : l.source;
       const toId = typeof l.target === "object" ? l.target.id : l.target;
+      if (isolatedNodes && (isolatedNodes.has(fromId) || isolatedNodes.has(toId))) {
+        return "rgba(0, 240, 255, 0.18)"; // Severed quarantined edge
+      }
       if (!isSimulating) return protocolColor(l.protocol);
+      
       const fromIdx = attackPath?.path?.indexOf(fromId) ?? -1;
       const toIdx = attackPath?.path?.indexOf(toId) ?? -1;
       const onPath = fromIdx !== -1 && toIdx === fromIdx + 1;
-      if (!onPath) return "rgba(35,44,82,0.35)";
-      const traversed = toIdx <= compromisedCount - 1;
-      return traversed ? "#E74C3C" : "#F39C12";
+      
+      if (onPath) {
+        const traversed = toIdx <= compromisedCount - 1;
+        return traversed ? "#E74C3C" : "#F39C12";
+      } else if (altEdges.has(`${fromId}-${toId}`)) {
+        return "#8E44AD"; // Purple for alternative path
+      }
+      return "rgba(35,44,82,0.35)";
     });
 
     fg.linkWidth((l) => {
       const fromId = typeof l.source === "object" ? l.source.id : l.source;
       const toId = typeof l.target === "object" ? l.target.id : l.target;
+      
       const fromIdx = attackPath?.path?.indexOf(fromId) ?? -1;
       const toIdx = attackPath?.path?.indexOf(toId) ?? -1;
       const onPath = isSimulating && fromIdx !== -1 && toIdx === fromIdx + 1;
-      return onPath ? 2.4 : 0.7;
+      
+      if (onPath) return 2.4;
+      if (isSimulating && altEdges.has(`${fromId}-${toId}`)) return 1.5;
+      return 0.7;
     });
 
     fg.linkOpacity(isSimulating ? 0.55 : 0.75);
 
-    fg.controls().autoRotate = !isSimulating;
+    // Glowing directional breach particles along traversed attack path
+    fg.linkDirectionalParticles((l) => {
+      const fromId = typeof l.source === "object" ? l.source.id : l.source;
+      const toId = typeof l.target === "object" ? l.target.id : l.target;
+      const fromIdx = attackPath?.path?.indexOf(fromId) ?? -1;
+      const toIdx = attackPath?.path?.indexOf(toId) ?? -1;
+      const onPath = isSimulating && fromIdx !== -1 && toIdx === fromIdx + 1;
+      if (onPath && toIdx <= compromisedCount - 1) return 3;
+      return 0;
+    });
+    fg.linkDirectionalParticleSpeed(0.005);
+    fg.linkDirectionalParticleWidth(2.2);
+    fg.linkDirectionalParticleColor(() => "#FF4C4C");
 
-    // Fly the camera to whichever node is currently under attack. Uses a
-    // fixed-distance offset along the node's direction from the origin
-    // rather than scaling the node's own coordinates — the naive
-    // "position * ratio" approach breaks down (camera flies to infinity)
-    // whenever a node sits near the origin, which happens routinely after
-    // zoomToFit recenters the whole scene.
-    if (isSimulating && activeNodeId) {
-      const node = fg.graphData().nodes.find((n) => n.id === activeNodeId);
-      if (node && node.x !== undefined) {
-        const OFFSET = 45;
-        const dist = Math.hypot(node.x, node.y, node.z || 0);
-        const [dx, dy, dz] = dist < 1 ? [0, 0.15, 1] : [node.x / dist, node.y / dist, (node.z || 0) / dist];
-        fg.cameraPosition(
-          { x: node.x + dx * OFFSET, y: node.y + dy * OFFSET + 25, z: (node.z || 0) + dz * OFFSET },
-          { x: node.x, y: node.y, z: node.z || 0 },
-          900
-        );
+    // Camera handling during hop progression (smooth 1.8s glide per hop)
+    if (isHopsAnimating) {
+      fg.controls().autoRotate = false;
+      if (activeNodeId) {
+        const node = fg.graphData().nodes.find((n) => n.id === activeNodeId);
+        if (node && node.x !== undefined) {
+          const OFFSET = 45;
+          const dist = Math.hypot(node.x, node.y, node.z || 0);
+          const [dx, dy, dz] = dist < 1 ? [0, 0.15, 1] : [node.x / dist, node.y / dist, (node.z || 0) / dist];
+          fg.cameraPosition(
+            { x: node.x + dx * OFFSET, y: node.y + dy * OFFSET + 25, z: (node.z || 0) + dz * OFFSET },
+            { x: node.x, y: node.y, z: node.z || 0 },
+            1800
+          );
+        }
       }
+    } else {
+      // Free camera orbit once simulation animation completes or when idle
+      fg.controls().autoRotate = true;
     }
-  }, [isSimulating, pathSet, settledSet, activeNodeId, attackPath, compromisedCount]);
+  }, [isSimulating, pathSet, settledSet, activeNodeId, attackPath, allAttackPaths, compromisedCount, status, STATUS, isHopsAnimating]);
 
-  // ── Return to the full overview once a run finishes/resets ─────────
-  // Deliberately separate from the tick-by-tick effect above so it only
-  // reacts to attackPath actually clearing (Reset), not to every
-  // narrative token — otherwise it would fight the fly-to camera above.
+  // ── Return to the full overview once hop animation completes ─────────
+  const prevAnimatingRef = useRef(false);
+  useEffect(() => {
+    const fg = fgRef.current;
+    if (!fg) return;
+    
+    // When the visual hop progression finishes, pause on target then smoothly zoom out
+    if (prevAnimatingRef.current && !isHopsAnimating) {
+      const timer = setTimeout(() => {
+        fg.zoomToFit(900, 60);
+        if (fg.controls()) {
+          fg.controls().target.set(0, 0, 0);
+          fg.controls().autoRotate = true;
+        }
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+    prevAnimatingRef.current = isHopsAnimating;
+  }, [isHopsAnimating]);
+
   useEffect(() => {
     const fg = fgRef.current;
     if (!fg || !hasFitRef.current) return;
-    if (!attackPath) fg.zoomToFit(400, 50);
+    if (!attackPath) {
+      fg.zoomToFit(400, 50);
+      if (fg.controls()) fg.controls().autoRotate = true;
+    }
   }, [attackPath]);
 
   return (
@@ -266,12 +456,67 @@ export default function NetworkGraph({ attackPath, narrative, status, STATUS }) 
         <span className="panel-eyebrow">01 // Network Topology · {graph.nodes.size} nodes · 3D</span>
         <h2>Bank Infrastructure Map</h2>
       </div>
-      <div className="network-graph-canvas" ref={containerRef} />
+      <div className="network-graph-canvas" ref={containerRef}>
+        {containmentMessage && (
+          <div className="containment-banner" role="alert">
+            {containmentMessage}
+          </div>
+        )}
+
+        {selectedNode && (
+          <div className="node-inspector-card">
+            <div className="inspector-header">
+              <span className="inspector-badge">{selectedNode.type}</span>
+              <h4>{selectedNode.name}</h4>
+              <button className="inspector-close" onClick={() => setSelectedNode(null)}>✕</button>
+            </div>
+            <div className="inspector-body">
+              <div><strong>Software:</strong> {selectedNode.software || "Unknown"}</div>
+              <div><strong>Role / ID:</strong> {selectedNode.id}</div>
+              <div>
+                <strong>MITRE:</strong> {getMitreAttackMapping(selectedNode).id} ({getMitreAttackMapping(selectedNode).tactic})
+              </div>
+              {selectedNode.cves?.length > 0 && (
+                <div><strong>Top CVE:</strong> {selectedNode.cves[0].cve_id} (CVSS {selectedNode.cves[0].cvss_score})</div>
+              )}
+            </div>
+            <div className="inspector-actions">
+              <button
+                type="button"
+                className={`btn-isolate ${isolatedNodes?.has(selectedNode.id) ? "is-quarantined" : ""}`}
+                onClick={() => toggleIsolateNode && toggleIsolateNode(selectedNode.id)}
+              >
+                {isolatedNodes?.has(selectedNode.id) ? "🛡️ Restore Host to Network" : "🛑 Isolate Host / Quarantine"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <PlaybackControls
+          isPlaying={isPlaying}
+          onTogglePlay={() => setIsPlaying((p) => !p)}
+          onPrevHop={() => setLiveHopIndex((prev) => Math.max(prev - 1, 1))}
+          onNextHop={() => setLiveHopIndex((prev) => Math.min(prev + 1, attackPath?.path?.length || 1))}
+          speed={playbackSpeed}
+          onSpeedChange={setPlaybackSpeed}
+          currentHop={compromisedCount}
+          totalHops={attackPath?.path?.length || 0}
+          isolatedCount={isolatedNodes?.size || 0}
+          onClearIsolation={() => {
+            if (isolatedNodes) {
+              for (const nid of isolatedNodes) toggleIsolateNode(nid);
+            }
+          }}
+          status={status}
+          STATUS={STATUS}
+        />
+      </div>
       <div className="graph-legend">
         <span className="legend-item"><i style={{ background: "#2ECC71" }} /> Low risk</span>
         <span className="legend-item"><i style={{ background: "#F1C40F" }} /> Medium risk</span>
         <span className="legend-item"><i style={{ background: "#F39C12" }} /> High risk</span>
         <span className="legend-item"><i style={{ background: "#E74C3C" }} /> Critical / compromised</span>
+        <span className="legend-item"><i style={{ background: "#8E44AD" }} /> Alternative Attack Path</span>
         <span className="legend-item legend-sep" />
         <span className="legend-item"><i style={{ background: "#3EC6FF" }} /> Web</span>
         <span className="legend-item"><i style={{ background: "#B57BFF" }} /> Database</span>

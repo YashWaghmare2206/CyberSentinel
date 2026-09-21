@@ -9,12 +9,12 @@
 // since it's a straight port, not an approximation.
 // ─────────────────────────────────────────────────────────────────────────
 
-import entNetwork from "./networks/enterprise-bank/network.json";
-import entCves from "./networks/enterprise-bank/cves.json";
-import sbNetwork from "./networks/small-branch-bank/network.json";
-import sbCves from "./networks/small-branch-bank/cves.json";
-import iotNetwork from "./networks/legacy-iot-bank/network.json";
-import iotCves from "./networks/legacy-iot-bank/cves.json";
+import entNetwork from "./networks/enterprise-bank/network.json" with { type: "json" };
+import entCves from "./networks/enterprise-bank/cves.json" with { type: "json" };
+import sbNetwork from "./networks/small-branch-bank/network.json" with { type: "json" };
+import sbCves from "./networks/small-branch-bank/cves.json" with { type: "json" };
+import iotNetwork from "./networks/legacy-iot-bank/network.json" with { type: "json" };
+import iotCves from "./networks/legacy-iot-bank/cves.json" with { type: "json" };
 
 const NETWORKS = {
   "enterprise-bank": { network: entNetwork, cves: entCves },
@@ -22,21 +22,51 @@ const NETWORKS = {
   "legacy-iot-bank": { network: iotNetwork, cves: iotCves }
 };
 
-// Maps real-world entry points to network nodes (mirrors graph.py exactly).
-export const COMMON_ENTRY_POINTS = {
-  api_gw_1: "Public-facing web apps (Unpatched software, Insecure APIs)",
-  admin_console_1: "Phishing / Insider Threat (Stolen credentials)",
-  load_balancer_1: "Exposed infrastructure / Weak remote endpoints",
-  linux_legacy_node: "IoT / Unmanaged legacy devices on network",
+export const NETWORK_OPTIONS = {
+  "enterprise-bank": {
+    sources: {
+      api_gw_1: "Public API Gateway (Unpatched software, Insecure APIs)",
+      admin_console_1: "Phishing / Insider (Stolen credentials)",
+      load_balancer_1: "Exposed Load Balancer (Weak endpoints)",
+      linux_legacy_node: "Unmanaged Legacy Device (IoT pivoting)",
+    },
+    destinations: {
+      swift_terminal: "SWIFT Terminal (Financial wire fraud)",
+      data_warehouse: "Data Warehouse (Customer records theft)",
+      core_db_node_1: "Core Database (Ransomware sabotage)",
+      web_app_1: "Web Application (Compute hijacking)",
+    },
+  },
+  "small-branch-bank": {
+    sources: {
+      branch_vpn_gateway: "Branch VPN Gateway (Insecure remote access)",
+      vault_iot_camera: "Vault IP Camera (IoT firmware vulnerability)",
+      teller_workstation_1: "Teller Workstation 1 (Phishing / Local exploit)",
+    },
+    destinations: {
+      atm_controller: "ATM Controller (Cash dispense manipulation)",
+      branch_file_server: "Branch File Server (Customer records / Exfiltration)",
+    },
+  },
+  "legacy-iot-bank": {
+    sources: {
+      unpatched_exchange: "Legacy Exchange Server (Remote code execution)",
+      legacy_hvac_controller: "Building HVAC BMS (Facility IoT backdoor)",
+    },
+    destinations: {
+      mainframe_terminal: "AS400 Mainframe Terminal (Core banking ledger)",
+      win7_workstation: "Legacy Win7 Workstation (Administrative control)",
+    },
+  },
 };
 
-// Maps real-world end goals to network nodes (mirrors graph.py exactly).
-export const COMMON_END_GOALS = {
-  swift_terminal: "Financial gain (Wire fraud, Cryptocurrency theft)",
-  data_warehouse: "Data theft (Customer records, Intellectual property)",
-  core_db_node_1: "Sabotage / Ransomware (Disrupting core services)",
-  web_app_1: "Botnet building / Persistence (Hijacking compute power)",
-};
+export const COMMON_ENTRY_POINTS = NETWORK_OPTIONS["enterprise-bank"].sources;
+export const COMMON_END_GOALS = NETWORK_OPTIONS["enterprise-bank"].destinations;
+
+export function getNetworkScenarios(networkId = "enterprise-bank") {
+  if (NETWORK_OPTIONS[networkId]) return NETWORK_OPTIONS[networkId];
+  return NETWORK_OPTIONS["enterprise-bank"];
+}
 
 // scorer.py: calculate_edge_weight — invert CVSS so high risk = low weight.
 function calculateEdgeWeight(cvssScore) {
@@ -99,10 +129,10 @@ export function buildGraph(networkId = "enterprise-bank", weightingMode = "stati
     const targetCvss = targetNode.cvss_score;
     
     let weight = calculateEdgeWeight(targetCvss);
-    if (weightingMode === "dwm") {
+    if (weightingMode === "dwm" || weightingMode === "ml") {
       const nodeCves = targetNode.cves || [];
       if (nodeCves.length > 0) {
-        // Find worst CVE for DWM params
+        // Find worst CVE for DWM/ML params
         const worst = nodeCves.reduce((a, b) => (Number(a.cvss_score) || 0) > (Number(b.cvss_score) || 0) ? a : b);
         weight = calculateDynamicWeight(targetCvss, worst.kev_listed, worst.days_since_published, worst.patch_available, targetNode.exposure);
       }
@@ -176,3 +206,39 @@ export function findAttackPaths(entryNode = "api_gw_1", targetNode = "swift_term
 export function getNode(id, networkId = "enterprise-bank", weightingMode = "static") {
   return buildGraph(networkId, weightingMode).nodes.get(id);
 }
+
+export function selectPath(paths, index = 0) {
+  if (!Array.isArray(paths) || paths.length === 0) return null;
+  const idx = Math.max(0, Math.min(paths.length - 1, Number(index) || 0));
+  return paths[idx];
+}
+
+/**
+ * Maps host and CVE details to standardized MITRE ATT&CK tactics & techniques.
+ */
+export function getMitreAttackMapping(node, cve) {
+  if (!node) return { id: "T1190", name: "Exploit Public-Facing Application", tactic: "Initial Access" };
+  const type = (node.type || "").toLowerCase();
+  const name = (node.name || "").toLowerCase();
+
+  if (name.includes("swift") || name.includes("wire")) {
+    return { id: "T1565", name: "Data Manipulation / Financial Fraud", tactic: "Impact" };
+  }
+  if (type === "database" || name.includes("database") || name.includes("warehouse")) {
+    return { id: "T1005", name: "Data from Local System", tactic: "Collection" };
+  }
+  if (type === "auth" || type === "directory" || name.includes("admin") || name.includes("console")) {
+    return { id: "T1078", name: "Valid Accounts: Credential Abuse", tactic: "Defense Evasion" };
+  }
+  if (type === "web" || name.includes("api") || name.includes("gateway") || name.includes("vpn")) {
+    return { id: "T1190", name: "Exploit Public-Facing Application", tactic: "Initial Access" };
+  }
+  if (name.includes("waf") || name.includes("firewall") || name.includes("balancer")) {
+    return { id: "T1562", name: "Impair Defenses: Perimeter Bypass", tactic: "Defense Evasion" };
+  }
+  if (type === "internal" || name.includes("queue") || name.includes("legacy")) {
+    return { id: "T1021", name: "Remote Services: Lateral Movement", tactic: "Lateral Movement" };
+  }
+  return { id: "T1068", name: "Exploitation for Privilege Escalation", tactic: "Privilege Escalation" };
+}
+

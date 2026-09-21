@@ -1,6 +1,6 @@
 # Data Warehousing and Mining (DWM) Concepts in CyberSentinel
 
-While CyberSentinel is primarily an attack path simulation engine, the underlying data architecture built during Phase 2 (Data & Graph Engine) maps perfectly to traditional **Data Warehousing and Data Mining** concepts. 
+While CyberSentinel is primarily an attack path simulation engine, the underlying data architecture built during Phascd e 2 (Data & Graph Engine) maps perfectly to traditional **Data Warehousing and Data Mining** concepts. 
 
 By designing the system this way, we essentially built the entire pre-processing, ETL, and Data Warehouse foundation required for the Gen AI agent to successfully "mine" the data for optimal attack paths.
 

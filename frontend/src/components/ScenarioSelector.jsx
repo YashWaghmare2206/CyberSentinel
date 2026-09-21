@@ -1,4 +1,4 @@
-import { COMMON_ENTRY_POINTS, COMMON_END_GOALS, getNode } from "../data/graphEngine";
+import { getNetworkScenarios, getNode } from "../data/graphEngine";
 import "./ScenarioSelector.css";
 
 export default function ScenarioSelector({
@@ -7,15 +7,25 @@ export default function ScenarioSelector({
   onEntryChange,
   onTargetChange,
   disabled,
+  networkId = "enterprise-bank",
 }) {
+  const scenarios = getNetworkScenarios(networkId);
+  const availableEntries = Object.entries(scenarios.sources || {});
+  const availableTargets = Object.entries(scenarios.destinations || {});
+
   return (
     <div className="scenario-selector">
       <label>
         <span>Entry point</span>
-        <select value={entryNode} onChange={(e) => onEntryChange(e.target.value)} disabled={disabled}>
-          {Object.entries(COMMON_ENTRY_POINTS).map(([id, desc]) => (
+        <select
+          value={entryNode}
+          onChange={(e) => onEntryChange(e.target.value)}
+          disabled={disabled}
+          title={scenarios.sources[entryNode] || entryNode}
+        >
+          {availableEntries.map(([id, desc]) => (
             <option key={id} value={id}>
-              {getNode(id)?.name ?? id} — {desc}
+              {desc}
             </option>
           ))}
         </select>
@@ -23,10 +33,15 @@ export default function ScenarioSelector({
       <span className="scenario-selector__arrow">→</span>
       <label>
         <span>End goal</span>
-        <select value={targetNode} onChange={(e) => onTargetChange(e.target.value)} disabled={disabled}>
-          {Object.entries(COMMON_END_GOALS).map(([id, desc]) => (
+        <select
+          value={targetNode}
+          onChange={(e) => onTargetChange(e.target.value)}
+          disabled={disabled}
+          title={scenarios.destinations[targetNode] || targetNode}
+        >
+          {availableTargets.map(([id, desc]) => (
             <option key={id} value={id}>
-              {getNode(id)?.name ?? id} — {desc}
+              {desc}
             </option>
           ))}
         </select>

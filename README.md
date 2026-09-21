@@ -2,6 +2,8 @@
 
 **PS10 — Generative AI for Cyber Attack Prediction**
 
+> 🚀 **Phase 2 Complete:** For the full person-by-person engineering breakdown, before-vs-after comparison, and audit checklist, see [**README_PHASE2.md**](README_PHASE2.md).
+
 CyberSentinel simulates realistic multi-hop attack paths through various
 simulated network topologies, narrates each attack in real time
 using a live LLM (Groq/Llama), and generates concrete auto-fix

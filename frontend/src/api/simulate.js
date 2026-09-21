@@ -13,34 +13,38 @@ import { localSimulateStream, localFixStream } from "../data/localEngine";
 export const API_BASE =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
-const CONNECT_TIMEOUT_MS = 1500;
+const CONNECT_TIMEOUT_MS = 6000;
 
 async function* readSSE(response) {
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
 
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
 
-    let boundary;
-    while ((boundary = buffer.indexOf("\n\n")) !== -1) {
-      const rawEvent = buffer.slice(0, boundary);
-      buffer = buffer.slice(boundary + 2);
-      const line = rawEvent.replace(/^data:\s?/, "").trim();
-      if (!line) continue;
-      if (line === "[DONE]") {
-        yield { type: "done" };
-        return;
-      }
-      try {
-        yield JSON.parse(line);
-      } catch {
-        // ignore malformed keep-alive lines
+      let boundary;
+      while ((boundary = buffer.indexOf("\n\n")) !== -1) {
+        const rawEvent = buffer.slice(0, boundary);
+        buffer = buffer.slice(boundary + 2);
+        const line = rawEvent.replace(/^data:\s?/, "").trim();
+        if (!line) continue;
+        if (line === "[DONE]") {
+          yield { type: "done" };
+          return;
+        }
+        try {
+          yield JSON.parse(line);
+        } catch {
+          // ignore malformed keep-alive lines
+        }
       }
     }
+  } finally {
+    yield { type: "done" };
   }
 }
 
@@ -68,14 +72,26 @@ async function postWithTimeout(path, body) {
  * Falls back to the local risk-weighted Dijkstra + narrative generator
  * (using Person 1's real network.json/cves.json) if the live backend errors.
  */
-export async function* streamSimulation({ entryNode, targetNode, entryLabel, targetLabel }) {
+export async function* streamSimulation({ entryNode, targetNode, entryLabel, targetLabel, networkId, algorithm, weightingMode, pathIndex = 0 }) {
   try {
-    const res = await postWithTimeout("/simulate", { entry_node: entryNode, target_node: targetNode });
+    const res = await postWithTimeout("/simulate", { 
+      entry_node: entryNode, 
+      target_node: targetNode,
+      network_id: networkId,
+      algorithm: algorithm,
+      weighting_mode: weightingMode,
+      path_index: pathIndex
+    });
     yield { type: "source", data: "live" };
     yield* readSSE(res);
   } catch {
     yield { type: "source", data: "local" };
-    yield* localSimulateStream(entryNode, targetNode, entryLabel, targetLabel);
+    yield* localSimulateStream(entryNode, targetNode, entryLabel, targetLabel, {
+      pathIndex,
+      networkId,
+      algorithm,
+      weightingMode
+    });
   }
 }
 
@@ -93,3 +109,22 @@ export async function* streamFix(attackPath) {
     yield* localFixStream(attackPath);
   }
 }
+
+/**
+ * Fetches available network topologies from Person 4's GET /networks endpoint,
+ * falling back gracefully if offline.
+ */
+export async function fetchNetworks() {
+  try {
+    const res = await fetch(`${API_BASE}/networks`);
+    if (res.ok) return await res.json();
+  } catch {
+    // Graceful offline fallback
+  }
+  return [
+    { id: "enterprise-bank", name: "Enterprise Bank", description: "Multi-tier corporate banking network" },
+    { id: "small-branch-bank", name: "Small Branch Bank", description: "Edge branch office topology" },
+    { id: "legacy-iot-bank", name: "Legacy IoT Bank", description: "Industrial & legacy OT infrastructure" },
+  ];
+}
+

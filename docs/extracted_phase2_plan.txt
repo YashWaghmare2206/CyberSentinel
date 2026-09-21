@@ -1,0 +1,182 @@
+CYBERSENTINEL
+Phase 2 Plan — Multi-Path Intelligence, Dynamic Weighting & UX Upgrade
+Builds on Phase 1 (Complete Project Blueprint & Team Work Division). This document keeps only what changes for Phase 2 and specifies exact current-state → target-state updates against the current GitHub repository.
+0. Phase 2 Context
+Phase 1 delivered a working, demoable product: a real 43-node network graph with real NVD CVEs (Person 1), a fully built React dashboard with graceful local-engine fallback (Person 3), a placeholder local narrative/fix generator standing in for the LLM (Person 2's gap), and an unshipped FastAPI integration layer (Person 4's gap). Phase 2 does not restart the project — it upgrades five specific capability gaps identified after reviewing the live repository, while keeping every file and interface that already works.
+Scope rule:  Nothing in Phase 1 that already works is rebuilt from scratch. Every section below states the exact current file/function, the exact change, and the exact new file(s), so no member re-does existing work.
+0.1 Phase 2 Objectives (from team review)
+Per-node safety guidance — every node in a path shows what the issue is, why it matters, and how to fix it (not one flat text block).
+Multi-path visibility — compute several candidate attack paths, rank them, and clearly highlight the most optimal (most dangerous) one for the attacker with a distance/risk summary per path.
+Multiple network topologies — let the user pick between different bank network scenarios before running a simulation, instead of one hardcoded network.
+Additional path-finding algorithms — add algorithms alongside Dijkstra, plus a learned/dynamic weighting layer (DWM), rather than relying on one fixed formula.
+Frontend navigation clarity — restructure the dashboard flow so a first-time viewer (e.g. a judge) can follow the simulation without guidance.
+0.2 Current Repository Structure (as of Phase 2 kickoff)
+CyberSentinel/
+├── ReadMe.md
+├── backend/
+│   ├── graph.py              Dijkstra pathfinding, dropdown option maps
+│   ├── scorer.py             calculate_edge_weight() — static CVSS→weight formula
+│   └── data/                 backend copy of network/CVE data
+├── src/
+│   ├── App.jsx                Dashboard shell / grid layout
+│   ├── api/simulate.js        Live-backend SSE fetch, 1.5s timeout, local fallback
+│   ├── hooks/useSimulation.js Orchestrates simulate → fix streaming state
+│   ├── components/
+│   │   ├── Header.jsx           Branding + scenario selector + control bar
+│   │   ├── ScenarioSelector.jsx Entry point / end goal dropdowns
+│   │   ├── ControlBar.jsx       Simulate Attack / Reset buttons
+│   │   ├── NetworkGraph.jsx     React Flow topology, auto-layout, camera-follow
+│   │   ├── RiskNode.jsx         Custom React Flow node
+│   │   ├── StreamPanel.jsx      SSE narrative, typewriter effect, severity badge
+│   │   ├── SeverityBadge.jsx    CRITICAL/HIGH/MEDIUM pill
+│   │   ├── RiskCards.jsx        CVE / CVSS cards per vulnerable node
+│   │   └── FixPanel.jsx         Single flat auto-fix text block (whole path)
+│   └── data/
+│       ├── network.json         Person 1's real topology (43 nodes)
+│       ├── cves.json            Person 1's real CVEs (real NVD IDs)
+│       ├── graphEngine.js       JS port of graph.py + scorer.py (verified identical)
+│       ├── layoutEngine.js      Auto-layout for the real topology
+│       ├── localEngine.js       Dynamic narrative/fix generator (LLM stand-in)
+│       └── layout.js            Risk color thresholds
+└── package.json                 React 18 + Vite + reactflow + axios
+0.3 What Is Confirmed Working (do not rebuild)
+backend/graph.py — build_graph() and find_attack_paths() correctly load network.json/cves.json into a NetworkX DiGraph and run nx.dijkstra_path for a single best path.
+backend/scorer.py — calculate_edge_weight() correctly inverts CVSS into a Dijkstra-usable weight (10.0 − cvss_score, clamped).
+src/data/graphEngine.js — verified byte-identical JS port of the above two files.
+src/api/simulate.js + hooks/useSimulation.js — live/local fallback plumbing already handles SSE + graceful degradation; Phase 2 changes extend the payload shape, not this plumbing.
+src/components/NetworkGraph.jsx — camera-follow and risk coloring already work and will be reused for multi-path highlighting.
+0.4 Feature → Owner Map (Phase 2)
+Feature
+Primary Owner
+Files Touched
+1. Per-node safety guidance
+Person 2 (content) + Person 3 (UI)
+cves.json, localEngine.js / llm.py, RiskCards.jsx, FixPanel.jsx
+2. Multi-path ranking & highlight
+Person 1 (backend) + Person 3 (UI)
+graph.py, graphEngine.js, new PathList.jsx
+3. Multi-network selection
+Person 1 (data) + Person 4 (API) + Person 3 (UI)
+data/networks/*, graph.py, new /networks endpoint, new NetworkSelector.jsx
+4. New algorithms + DWM
+Person 1 (algorithms) + Person 2 (learned weights)
+graph.py, new astar.py, scorer.py → dwm_scorer.py
+5. Frontend navigation upgrade
+Person 3
+Header.jsx, App.jsx, new StepBar.jsx
+1. Per-Node Safety Guidance (Issue → Impact → Fix)
+1.1 Current State
+FixPanel.jsx renders one flat fixText string covering the whole path, streamed from localEngine.js / (eventually) llm.py. There is no per-node breakdown — a viewer cannot tell which fix applies to which hop. RiskCards.jsx already shows per-node CVE/CVSS data but has no remediation field.
+1.2 What Needs to Update
+cves.json — each CVE entry needs a structured remediation object, not just a CVSS number.
+find_attack_paths() in graph.py / graphEngine.js — the returned path_nodes already embed each node's cves list; extend it to also carry that node's remediation entries.
+FixPanel.jsx — stop rendering a single blob; render per-node sections.
+1.3 How to Update
+Step 1 — Add a remediation field to every CVE object in cves.json: { "issue": short description of the flaw, "impact": what an attacker gains at this node, "fix": concrete remediation step }.
+Step 2 — In localEngine.js (and later llm.py), generate/attach remediation text per node while building the narrative, keyed by node_id, instead of one combined fixText string.
+Step 3 — Change FixPanel.jsx into a list of per-node cards (reuse the RiskCards.jsx card layout): each card shows node name → CVE/CVSS (issue) → "What this lets an attacker do" (impact) → "How to fix" (fix).
+Step 4 — Keep the existing typewriter/streaming behavior, but stream card-by-card (per node) instead of one continuous paragraph, so the reveal follows the attack path order.
+1.4 New Additions
+New shared component: SafetyCard.jsx — a single reusable node-level card (issue/impact/fix) used by both RiskCards and FixPanel, so the two panels stay visually consistent.
+New data contract: every node object returned by /simulate now includes a remediation array, not just a cves array.
+2. Multiple Attack Paths, Ranked, With the Optimal One Highlighted
+2.1 Current State
+find_attack_paths() in graph.py (and its JS twin in graphEngine.js) calls nx.dijkstra_path once and returns exactly one path wrapped in a single-item list. The frontend has no concept of alternate paths — NetworkGraph.jsx highlights only the one path it is given.
+2.2 What Needs to Update
+graph.py / graphEngine.js — replace the single dijkstra_path call with a top-K path search.
+Response payload — must carry multiple ranked paths, each with its own total distance/weight, not one path.
+Frontend — needs a new ranked list view, and NetworkGraph.jsx needs to accept a selected path index instead of always drawing the same one.
+2.3 How to Update
+Step 1 — Swap nx.dijkstra_path(...) for nx.shortest_simple_paths(G, source, target, weight="weight") and take the first K (e.g. 5) results — this yields paths in ascending order of total weight for free.
+Step 2 — For each path, sum edge weights along it into total_weight, keep total_hops as before, and sort ascending — lowest total_weight is the attacker's most efficient ("optimal") route, since weight is inverted CVSS risk.
+Step 3 — Return a list of { path, nodes, total_weight, total_hops, rank } objects instead of a single-item list; mark rank 1 as is_optimal: true.
+Step 4 — Port the identical change into graphEngine.js so the local fallback stays byte-identical to the backend, matching the existing verification standard from Phase 1.
+Step 5 — Add a PathList.jsx component: a compact ranked table/strip (Path #, hop count, total distance/risk score) shown above NetworkGraph.jsx; rank 1 is visually badged "Most Likely Attack Path."
+Step 6 — Clicking any row in PathList.jsx sets the active path index in useSimulation.js, which re-triggers NetworkGraph.jsx's highlight/camera-follow and re-runs StreamPanel/FixPanel for that specific path — no change needed to the existing SSE plumbing, only which path is passed in.
+2.4 New Additions
+New component: PathList.jsx — ranked alternate-path viewer with distance summary per path.
+New state: selectedPathIndex in useSimulation.js.
+New badge: "Most Optimal for Attacker" indicator, computed purely from rank, shown on both PathList.jsx and NetworkGraph.jsx.
+3. Multiple Network Topologies to Choose Between
+3.1 Current State
+data/network.json and data/cves.json are single hardcoded files; build_graph() in graph.py always loads DEFAULT_NETWORK_PATH / DEFAULT_CVE_PATH. There is exactly one 43-node bank network — no way to pick a different topology or scenario.
+3.2 What Needs to Update
+Data layout — move from single files to a folder-per-network structure.
+graph.py — build_graph() must accept a network selector instead of a fixed default path.
+Backend API (Person 4) — needs a new endpoint to list and select networks.
+Frontend — needs a network-selection step before entry/goal selection, since node IDs differ per network.
+3.3 How to Update
+Step 1 — Restructure: data/networks/<network_id>/network.json and data/networks/<network_id>/cves.json. Migrate the existing 43-node file into data/networks/enterprise-bank/ unchanged — this preserves all Phase 1 work.
+Step 2 — Add 1–2 additional network scenarios for variety, e.g. small-branch-bank (fewer nodes, simpler chain) and legacy-iot-bank (weighted toward the existing linux_legacy_node style entry points) — reusing the same JSON schema Person 1 already defined.
+Step 3 — Add list_networks() to graph.py returning { id, name, description, node_count } per folder; update build_graph(network_id=...) to resolve paths from the selected folder instead of DEFAULT_NETWORK_PATH.
+Step 4 — Person 4 adds GET /networks (returns list_networks() output) and updates POST /simulate to accept a network_id field.
+Step 5 — Frontend: new NetworkSelector.jsx, shown before ScenarioSelector.jsx. Selecting a network refetches that network's own entry/goal dropdown options (COMMON_ENTRY_POINTS/COMMON_END_GOALS already differ per network) and reloads NetworkGraph.jsx's topology before "Simulate Attack" becomes clickable.
+3.4 New Additions
+New component: NetworkSelector.jsx.
+New backend endpoint: GET /networks.
+New data folders: data/networks/small-branch-bank/, data/networks/legacy-iot-bank/ (in addition to the existing enterprise-bank/).
+4. Additional Path-Finding Algorithms + Dynamic Weight Management (DWM)
+4.1 Current State
+Dijkstra (via NetworkX) is the only path-finding algorithm. scorer.py computes a single static weight: weight = 10.0 − cvss_score, clamped between 0.1 and 10.0. This uses only the CVE's official CVSS base score from NVD — no time, exploit-activity, or network-context factors are considered.
+4.2 What Needs to Update
+graph.py — add algorithm choices alongside Dijkstra, without removing it.
+scorer.py — extend beyond the static base-CVSS formula using CVSS's own Temporal and Environmental scoring layers (this does not override NVD's official base score, it supplements it — NVD explicitly leaves Temporal/Environmental scoring to the consumer).
+cves.json — needs the extra fields Temporal/Environmental scoring depends on.
+4.3 How to Update — New Algorithms
+A* search — Add find_attack_paths_astar() using nx.astar_path(G, source, target, heuristic=..., weight="weight"); heuristic estimates remaining hops × average CVSS along historical paths. Cheap to add on top of the existing NetworkX setup.
+Top-K simple paths — Already added in Section 2 (nx.shortest_simple_paths) — this doubles as the "alongside Dijkstra" algorithm requirement and the multi-path requirement.
+Algorithm selector — POST /simulate accepts an optional algorithm field ("dijkstra" | "astar" | "ml-weighted", default "dijkstra"); graph.py dispatches to the matching function. Frontend gets a small toggle in ControlBar.jsx so a demo can show "look, a different algorithm finds a different path."
+4.4 How to Update — Dynamic Weight Management (DWM)
+CVSS officially defines three metric layers: Base Score (from NVD, static — what cves.json already stores), Temporal Score (exploit maturity, patch availability — changes over time), and Environmental Score (specific to this network's exposure/criticality). DWM implements the Temporal and Environmental layers on top of the untouched official Base Score.
+Step 1 — Add to each CVE entry in cves.json: kev_listed (bool, from CISA Known Exploited Vulnerabilities list), days_since_published, patch_available (bool).
+Step 2 — Add to each node in network.json: exposure (public | internal | critical) — largely already implied by the existing type field, formalize it as its own attribute.
+Step 3 — New dwm_scorer.py: calculate_dynamic_weight(base_cvss, kev_listed, days_since_published, patch_available, exposure) → returns an adjusted_weight float, computed as base_cvss × temporal_multiplier × environmental_multiplier, then run through the same 10.0 − x inversion as scorer.py so it drops into Dijkstra/A* without changing their call signature.
+Step 4 — graph.py's build_graph() gains a weighting_mode param ("static" | "dwm") choosing between scorer.calculate_edge_weight and dwm_scorer.calculate_dynamic_weight when building edges.
+Step 5 — Frontend: show both numbers side by side on SafetyCard.jsx — "CVSS 9.8 (NVD Base)" next to "Contextual Risk 9.95 (KEV-listed, internet-facing)" — makes the distinction visible rather than silently swapping the number.
+4.5 Learned / ML-Weighted Option (stretch goal, not deep learning)
+A full deep-learning path planner is not achievable at hackathon scope and isn't needed — a lightweight learned scorer is. Train a small logistic regression / gradient-boosted model on features (CVSS, exposure, kev_listed, node degree/centrality) to output a probability-of-compromise per edge, replacing the hand-picked multipliers in dwm_scorer.py with learned coefficients. This is exposed as the existing "ml-weighted" algorithm option from Section 4.3 — same call signature, same Dijkstra/A* code path, only the weights differ.
+4.6 New Additions
+New file: backend/astar.py or an added function in graph.py for A* search.
+New file: backend/dwm_scorer.py — Temporal + Environmental CVSS layers as an adjusted weight.
+New optional file: backend/ml_scorer.py — learned edge-weight model (stretch).
+New fields in cves.json (kev_listed, days_since_published, patch_available) and network.json (exposure).
+New API param: algorithm on POST /simulate; new UI toggle in ControlBar.jsx.
+5. Frontend Navigation & Simulation Clarity
+5.1 Current State
+App.jsx renders Header, ScenarioSelector, ControlBar, NetworkGraph, StreamPanel, RiskCards, and FixPanel all in one grid, always in the same stacked layout regardless of simulation state. There is no explicit step indicator — a first-time viewer has to infer the flow (pick scenario → click Simulate → read panels).
+5.2 What Needs to Update
+Header.jsx / App.jsx — add an explicit step sequence so progress through the flow is always visible.
+Panel layout — reduce permanent stacking of RiskCards + FixPanel so the graph stays the visual anchor.
+Integrate the new pieces from Sections 2 and 3 (PathList.jsx, NetworkSelector.jsx) into the flow without cluttering it.
+5.3 How to Update
+Step 1 — Add a thin StepBar.jsx under Header.jsx with five steps: 1 Select Network → 2 Choose Entry/Goal → 3 Simulate → 4 Review Paths → 5 Fixes. Current step is derived from existing STATUS values in useSimulation.js plus the new network/path selection state — no new state machine required.
+Step 2 — Reorder App.jsx's grid to match the step order: NetworkSelector → ScenarioSelector → ControlBar → NetworkGraph (with PathList directly above it) → StreamPanel → tabbed RiskCards/FixPanel.
+Step 3 — Convert the RiskCards / FixPanel pair into a tab switcher ("Risks" / "Fixes") once a path is selected, instead of both rendering permanently — cuts vertical scroll substantially, especially now that FixPanel is per-node (Section 1) and therefore longer.
+Step 4 — Keep NetworkGraph.jsx's existing camera-follow and dimming behavior untouched; only feed it the currently selected path index (Section 2) and network topology (Section 3).
+5.4 New Additions
+New component: StepBar.jsx.
+New layout: tabbed Risks/Fixes panel replacing permanent dual-stack.
+No changes required to NetworkGraph.jsx's rendering engine — only its inputs.
+6. Phase 2 Milestone Checklist
+Item
+Current State
+Phase 2 Target
+Per-node safety cards
+Single flat fixText block
+SafetyCard.jsx per node, issue/impact/fix
+Path results
+1 path (dijkstra_path)
+Top-K ranked paths, optimal highlighted, distance shown
+Network topology
+1 hardcoded network
+≥3 selectable networks via /networks
+Weighting
+Static CVSS-only formula
+DWM (Temporal + Environmental) + optional ML weights
+Algorithms
+Dijkstra only
+Dijkstra + A* + simple-paths, selectable
+Frontend flow
+Ungated stacked panels
+StepBar-guided flow, tabbed Risks/Fixes
+All Phase 2 changes are additive on top of Phase 1's verified files (graph.py, scorer.py, graphEngine.js, NetworkGraph.jsx, useSimulation.js, simulate.js) — none of that working code is discarded.

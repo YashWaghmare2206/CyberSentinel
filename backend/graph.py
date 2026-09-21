@@ -3,35 +3,65 @@ import json
 import networkx as nx
 from scorer import calculate_edge_weight
 import dwm_scorer
+import ml_scorer
 from itertools import islice
 
 # Resolve absolute paths relative to this script
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 NETWORKS_DIR = os.path.join(BASE_DIR, "data", "networks")
 
-# --- REAL-WORLD THREAT MODELING (DROPDOWN OPTIONS) ---
-COMMON_ENTRY_POINTS = {
-    "api_gw_1": "Public-facing web apps (Unpatched software, Insecure APIs)",
-    "admin_console_1": "Phishing / Insider Threat (Stolen credentials)",
-    "load_balancer_1": "Exposed infrastructure / Weak remote endpoints",
-    "linux_legacy_node": "IoT / Unmanaged legacy devices on network"
+# --- REAL-WORLD THREAT MODELING (DROPDOWN OPTIONS PER NETWORK) ---
+NETWORK_OPTIONS = {
+    "enterprise-bank": {
+        "sources": {
+            "api_gw_1": "Public API Gateway (Unpatched software, Insecure APIs)",
+            "admin_console_1": "Phishing / Insider (Stolen credentials)",
+            "load_balancer_1": "Exposed Load Balancer (Weak endpoints)",
+            "linux_legacy_node": "Unmanaged Legacy Device (IoT pivoting)"
+        },
+        "destinations": {
+            "swift_terminal": "SWIFT Terminal (Financial wire fraud)",
+            "data_warehouse": "Data Warehouse (Customer records theft)",
+            "core_db_node_1": "Core Database (Ransomware sabotage)",
+            "web_app_1": "Web Application (Compute hijacking)"
+        }
+    },
+    "small-branch-bank": {
+        "sources": {
+            "branch_vpn_gateway": "Branch VPN Gateway (Insecure remote access)",
+            "vault_iot_camera": "Vault IP Camera (IoT firmware vulnerability)",
+            "teller_workstation_1": "Teller Workstation 1 (Phishing / Local exploit)"
+        },
+        "destinations": {
+            "atm_controller": "ATM Controller (Cash dispense manipulation)",
+            "branch_file_server": "Branch File Server (Customer records / Exfiltration)"
+        }
+    },
+    "legacy-iot-bank": {
+        "sources": {
+            "unpatched_exchange": "Legacy Exchange Server (Remote code execution)",
+            "legacy_hvac_controller": "Building HVAC BMS (Facility IoT backdoor)"
+        },
+        "destinations": {
+            "mainframe_terminal": "AS400 Mainframe Terminal (Core banking ledger)",
+            "win7_workstation": "Legacy Win7 Workstation (Administrative control)"
+        }
+    }
 }
 
-COMMON_END_GOALS = {
-    "swift_terminal": "Financial gain (Wire fraud, Cryptocurrency theft)",
-    "data_warehouse": "Data theft (Customer records, Intellectual property)",
-    "core_db_node_1": "Sabotage / Ransomware (Disrupting core services)",
-    "web_app_1": "Botnet building / Persistence (Hijacking compute power)"
-}
+COMMON_ENTRY_POINTS = NETWORK_OPTIONS["enterprise-bank"]["sources"]
+COMMON_END_GOALS = NETWORK_OPTIONS["enterprise-bank"]["destinations"]
 
-def get_dropdown_options():
+def get_dropdown_options(network_id=None):
     """
-    Exposes the common entry points and end goals.
-    Person 4 (API) will serve this to Person 3 (Frontend) to build the UI dropdowns.
+    Exposes entry points and end goals per network topology.
     """
+    if network_id and network_id in NETWORK_OPTIONS:
+        return NETWORK_OPTIONS[network_id]
     return {
         "sources": COMMON_ENTRY_POINTS,
-        "destinations": COMMON_END_GOALS
+        "destinations": COMMON_END_GOALS,
+        "all_networks": NETWORK_OPTIONS
     }
 
 # --- CORE GRAPH ENGINE ---
@@ -113,15 +143,31 @@ def build_graph(network_id="enterprise-bank", weighting_mode="static"):
         
         if weighting_mode == "dwm":
             cves = target_node.get("cves", [])
-            # Find worst CVE to use for DWM or take defaults
             if cves:
                 worst_cve = max(cves, key=lambda c: float(c.get("cvss_score", 0.0)))
-                weight, adj_score = dwm_scorer.calculate_dynamic_weight(
+                weight, adj_score = dwm_scorer.calculate_dynamic_weight_tuple(
                     target_cvss,
                     worst_cve.get("kev_listed", False),
                     worst_cve.get("days_since_published", 0),
                     worst_cve.get("patch_available", False),
                     target_node.get("exposure", "internal")
+                )
+                target_node["adjusted_weight"] = adj_score
+            else:
+                weight = calculate_edge_weight(target_cvss)
+                target_node["adjusted_weight"] = target_cvss
+        elif weighting_mode == "ml":
+            cves = target_node.get("cves", [])
+            node_degree = len(network_data.get("edges", []))  # relative baseline
+            if cves:
+                worst_cve = max(cves, key=lambda c: float(c.get("cvss_score", 0.0)))
+                weight, adj_score = ml_scorer.calculate_ml_weight_tuple(
+                    target_cvss,
+                    worst_cve.get("kev_listed", False),
+                    worst_cve.get("days_since_published", 0),
+                    worst_cve.get("patch_available", False),
+                    target_node.get("exposure", "internal"),
+                    node_degree=node_degree
                 )
                 target_node["adjusted_weight"] = adj_score
             else:
@@ -170,21 +216,23 @@ def find_attack_paths_astar(G, source, target, top_k=5):
         return {"error": f"Invalid destination: {target} not in network map."}
     
     try:
-        def heuristic(u, v):
-            return 0.0
-
-        path = nx.astar_path(G, source, target, heuristic=heuristic, weight="weight")
-        path_nodes = [G.nodes[n] for n in path]
-        total_weight = sum(G[u][v]["weight"] for u, v in zip(path[:-1], path[1:]))
+        # Generate Top-K ranked paths using shortest simple paths with edge weights
+        paths_gen = nx.shortest_simple_paths(G, source=source, target=target, weight="weight")
+        top_paths_list = list(islice(paths_gen, top_k))
         
-        return [{
-            "rank": 1,
-            "is_optimal": True,
-            "path": path,
-            "nodes": path_nodes,
-            "total_weight": total_weight,
-            "total_hops": len(path) - 1
-        }]
+        results = []
+        for i, path in enumerate(top_paths_list):
+            path_nodes = [G.nodes[n] for n in path]
+            total_weight = sum(G[u][v]["weight"] for u, v in zip(path[:-1], path[1:]))
+            results.append({
+                "rank": i + 1,
+                "is_optimal": (i == 0),
+                "path": path,
+                "nodes": path_nodes,
+                "total_weight": round(total_weight, 2),
+                "total_hops": len(path) - 1
+            })
+        return results
     except nx.NetworkXNoPath:
         return {"error": f"No valid network path exists between {source} and {target}."}
 

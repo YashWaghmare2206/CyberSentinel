@@ -1,4 +1,5 @@
-import { riskTier } from "../data/layout";
+import SafetyCard from "./SafetyCard";
+import { buildNodeFix } from "../data/localEngine";
 import "./RiskCards.css";
 
 function topCve(node) {
@@ -6,55 +7,47 @@ function topCve(node) {
   return [...node.cves].sort((a, b) => (b.cvss_score ?? 0) - (a.cvss_score ?? 0))[0];
 }
 
-export default function RiskCards({ attackPath, status, STATUS }) {
+export default function RiskCards({ attackPath, status, STATUS, weightingMode = "static" }) {
   const hasRun = status !== STATUS.IDLE;
-  const vulnerableNodes = (attackPath?.nodes ?? []).filter((n) => n.cves?.length);
+  const nodes = attackPath?.nodes ?? [];
+  const vulnerableNodes = nodes.filter((n) => n.cves?.length);
 
   return (
     <div className="risk-cards-panel">
       <div className="panel-header">
-        <span className="panel-eyebrow">03 // Vulnerability Breakdown</span>
-        <h2>Risk Cards</h2>
+        <span className="panel-eyebrow">03 // Vulnerability Breakdown & Threat Intelligence</span>
+        <h2>Vulnerability Risk Cards</h2>
         {hasRun && <span className="risk-cards-count">{vulnerableNodes.length} hosts flagged</span>}
       </div>
 
       {!hasRun && (
         <div className="risk-cards-empty">
-          CVE details for each node on the attack path will appear here once a
-          simulation runs.
+          CVE threat intelligence and vulnerability details for each node along the attack path will
+          appear here once a simulation runs.
         </div>
       )}
 
       {hasRun && (
         <div className="risk-cards-grid">
-          {vulnerableNodes.map((node) => {
+          {nodes.map((node, i) => {
             const cve = topCve(node);
-            const tier = riskTier(cve.cvss_score);
-            const extra = node.cves.length - 1;
+            const remediation = buildNodeFix(node);
+
             return (
-              <a
-                key={node.id}
-                className={`risk-card risk-card--${tier}`}
-                href={`https://nvd.nist.gov/vuln/detail/${cve.cve_id}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <div className="risk-card__head">
-                  <span className="risk-card__node">{node.name}</span>
-                  <span className={`risk-card__badge risk-card__badge--${tier}`}>
-                    {cve.cvss_score.toFixed(1)}
-                  </span>
-                </div>
-                <div className="risk-card__cve">
-                  {cve.cve_id}
-                  {extra > 0 && <span className="risk-card__extra"> +{extra} more CVE{extra === 1 ? "" : "s"}</span>}
-                </div>
-                <p className="risk-card__desc">{cve.description}</p>
-                <div className="risk-card__footer">
-                  <span>{cve.exploit_type}</span>
-                  <span className="risk-card__link">View on NVD ↗</span>
-                </div>
-              </a>
+              <SafetyCard
+                key={`${node.id}-${i}`}
+                hopIndex={i}
+                nodeId={node.id}
+                nodeName={node.name}
+                cveId={cve?.cve_id}
+                cvssScore={cve?.cvss_score}
+                adjustedScore={node.adjusted_weight}
+                weightingMode={weightingMode}
+                severity={cve?.severity}
+                issue={remediation?.issue}
+                impact={remediation?.impact}
+                fix={remediation?.fix}
+              />
             );
           })}
         </div>

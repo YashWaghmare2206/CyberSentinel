@@ -39,7 +39,7 @@ load_dotenv()
 
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq").lower()   # groq | gemini | claude | mock
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-GROQ_MODEL = os.getenv("GROQ_MODEL", "llama3-70b-8192")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
@@ -139,11 +139,15 @@ def build_user_message(attack_path: Dict[str, Any]) -> str:
         cves = node.get("cves") or []
         if not cves:
             lines.append("    No known CVEs on this node — treat as a pivot/transit hop only.")
-        for cve in cves:
-            lines.append(
-                f"    - {cve.get('cve_id')} (CVSS {cve.get('cvss_score')}, "
-                f"{cve.get('severity')}): {cve.get('description', '')[:220]}"
-            )
+        else:
+            # Focus on the most critical CVEs for this hop to avoid massive token bloat
+            top_cves = sorted(cves, key=lambda c: float(c.get("cvss_score", 0)), reverse=True)[:2]
+            for cve in top_cves:
+                desc = (cve.get('description', '') or '').split(". ")[0]
+                lines.append(
+                    f"    - {cve.get('cve_id')} (CVSS {cve.get('cvss_score')}, "
+                    f"{cve.get('severity')}): {desc}"
+                )
 
     lines.append(
         "\nGenerate the attack simulation narrative for exactly this path, in order."
@@ -161,10 +165,12 @@ def build_fix_user_message(attack_path: Dict[str, Any]) -> str:
         if not cves:
             continue
         lines.append(f"[{i}] {node['name']} — Software: {node.get('software', 'Unknown')}")
-        for cve in cves:
+        top_cves = sorted(cves, key=lambda c: float(c.get("cvss_score", 0)), reverse=True)[:2]
+        for cve in top_cves:
+            desc = (cve.get('description', '') or '').split(". ")[0]
             lines.append(
                 f"    - {cve.get('cve_id')} (CVSS {cve.get('cvss_score')}): "
-                f"{cve.get('description', '')[:200]} | Patch note: {cve.get('patch', 'n/a')}"
+                f"{desc} | Patch: {cve.get('patch', 'apply vendor patch')}"
             )
     lines.append("\nGenerate prioritized remediation steps for this exact chain.")
     return "\n".join(lines)
@@ -176,7 +182,7 @@ def build_fix_user_message(attack_path: Dict[str, Any]) -> str:
 
 async def _mock_stream(text: str) -> AsyncGenerator[str, None]:
     for word in text.split(" "):
-        await asyncio.sleep(0.02)
+        await asyncio.sleep(0.065)
         yield word + " "
 
 
@@ -250,6 +256,7 @@ async def _stream_groq(system_prompt: str, user_message: str) -> AsyncGenerator[
                 "model": GROQ_MODEL,
                 "stream": True,
                 "temperature": 0.4,
+                "max_tokens": 350,
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_message},
@@ -337,16 +344,21 @@ async def _stream_claude(system_prompt: str, user_message: str) -> AsyncGenerato
 
 
 async def _dispatch_stream(system_prompt: str, user_message: str, mock_text: str) -> AsyncGenerator[str, None]:
-    if LLM_PROVIDER == "groq":
-        async for tok in _stream_groq(system_prompt, user_message):
-            yield tok
-    elif LLM_PROVIDER == "gemini":
-        async for tok in _stream_gemini(system_prompt, user_message):
-            yield tok
-    elif LLM_PROVIDER == "claude":
-        async for tok in _stream_claude(system_prompt, user_message):
-            yield tok
-    else:  # mock
+    try:
+        if LLM_PROVIDER == "groq":
+            async for tok in _stream_groq(system_prompt, user_message):
+                yield tok
+        elif LLM_PROVIDER == "gemini":
+            async for tok in _stream_gemini(system_prompt, user_message):
+                yield tok
+        elif LLM_PROVIDER == "claude":
+            async for tok in _stream_claude(system_prompt, user_message):
+                yield tok
+        else:  # mock
+            async for tok in _mock_stream(mock_text):
+                yield tok
+    except Exception as e:
+        print(f"[WARN] Live LLM provider '{LLM_PROVIDER}' error: {e}. Falling back to offline dynamic generator.")
         async for tok in _mock_stream(mock_text):
             yield tok
 
@@ -399,7 +411,7 @@ if __name__ == "__main__":
     async def main():
         print(f"LLM_PROVIDER resolved to: {LLM_PROVIDER}")
         G = build_graph()
-        paths = find_attack_paths(G, entry_node="api_gw_1", target_node="swift_terminal")
+        paths = find_attack_paths(G, source="api_gw_1", target="swift_terminal")
         if isinstance(paths, dict) and "error" in paths:
             print("Graph error:", paths["error"])
             return

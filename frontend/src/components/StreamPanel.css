@@ -79,12 +79,23 @@
 .stream-panel__footer {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 14px;
   border-top: 1px solid var(--panel-border);
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-dim);
+  background: rgba(10, 15, 38, 0.6);
+  flex-wrap: nowrap;
+}
+
+.stream-panel__status-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .status-dot {
@@ -92,6 +103,7 @@
   height: 7px;
   border-radius: 50%;
   background: #3A4374;
+  flex-shrink: 0;
 }
 .status-dot--idle { background: #3A4374; }
 .status-dot--simulating { background: #F39C12; animation: dot-pulse 1s ease-in-out infinite; }
@@ -106,12 +118,12 @@
 }
 
 .source-pill {
-  margin-left: auto;
-  padding: 2px 8px;
+  padding: 1.5px 6px;
   border-radius: 4px;
-  font-size: 9.5px;
+  font-size: 9px;
   letter-spacing: 0.06em;
   font-weight: 700;
+  flex-shrink: 0;
 }
 .source-pill--live {
   background: rgba(46, 204, 113, 0.12);
@@ -122,4 +134,55 @@
   background: rgba(124, 137, 184, 0.12);
   color: #7C89B8;
   border: 1px solid rgba(124, 137, 184, 0.35);
+}
+
+.stream-panel__dock-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.detail-dock__btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4.5px 9px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  background: var(--panel-bg-raised);
+  border: 1px solid var(--panel-border);
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.detail-dock__btn:hover:not(:disabled) {
+  color: var(--text-bright);
+  border-color: var(--accent);
+  background: rgba(0, 240, 255, 0.1);
+}
+
+.detail-dock__btn.is-active {
+  color: #00f0ff;
+  border-color: #00f0ff;
+  background: rgba(0, 240, 255, 0.15);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+}
+
+.detail-dock__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.detail-dock__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #4FA3FF;
+  animation: dot-pulse 1s ease-in-out infinite;
 }

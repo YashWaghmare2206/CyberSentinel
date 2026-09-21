@@ -11,27 +11,91 @@ export default function Header({
   targetNode,
   onEntryChange,
   onTargetChange,
+  networkId,
+  algorithm,
+  weightingMode,
+  onNetworkChange,
+  onAlgorithmChange,
+  onWeightingModeChange,
+  onOpenReport,
 }) {
   const isBusy = status !== STATUS.IDLE && status !== STATUS.COMPLETE && status !== STATUS.ERROR;
   return (
     <header className="app-header">
       <div className="app-header__brand">
         <span className="app-header__mark">◆</span>
-        <div>
-          <h1>
-            CyberSentinel<span className="app-header__cursor">_</span>
-          </h1>
-          <p>Predict. Prevent. Protect. — PS10 Gen AI Cyber Attack Prediction</p>
-        </div>
+        <h1>
+          CyberSentinel<span className="app-header__cursor">_</span>
+        </h1>
       </div>
-      <ScenarioSelector
-        entryNode={entryNode}
-        targetNode={targetNode}
-        onEntryChange={onEntryChange}
-        onTargetChange={onTargetChange}
-        disabled={isBusy}
-      />
-      <ControlBar status={status} STATUS={STATUS} onSimulate={onSimulate} onReset={onReset} />
+
+      <div className="app-header__center">
+        <div className="header-control-group">
+          <label className="header-control-label">
+            <span>Network</span>
+            <select
+              className="header-select header-select--network"
+              value={networkId}
+              onChange={(e) => onNetworkChange(e.target.value)}
+              disabled={isBusy}
+            >
+              <option value="enterprise-bank">Enterprise Bank</option>
+              <option value="small-branch-bank">Small Branch Bank</option>
+              <option value="legacy-iot-bank">Legacy IoT Bank</option>
+            </select>
+          </label>
+
+          <label className="header-control-label">
+            <span>Algorithm</span>
+            <select
+              className="header-select header-select--algo"
+              value={algorithm}
+              onChange={(e) => onAlgorithmChange(e.target.value)}
+              disabled={isBusy}
+            >
+              <option value="dijkstra">Top-K Dijkstra</option>
+              <option value="astar">A* Search</option>
+            </select>
+          </label>
+
+          <label className="header-control-label">
+            <span>Risk Model</span>
+            <select
+              className="header-select header-select--model"
+              value={weightingMode}
+              onChange={(e) => onWeightingModeChange(e.target.value)}
+              disabled={isBusy}
+            >
+              <option value="static">Static CVSS</option>
+              <option value="dwm">Dynamic Weight (DWM)</option>
+              <option value="ml">Machine Learning (ML)</option>
+            </select>
+          </label>
+        </div>
+
+        <div className="header-divider" />
+
+        <ScenarioSelector
+          entryNode={entryNode}
+          targetNode={targetNode}
+          onEntryChange={onEntryChange}
+          onTargetChange={onTargetChange}
+          disabled={isBusy}
+          networkId={networkId}
+        />
+      </div>
+
+      <div className="app-header__actions">
+        <ControlBar status={status} STATUS={STATUS} onSimulate={onSimulate} onReset={onReset} />
+        <button
+          type="button"
+          className="btn-export-report"
+          onClick={onOpenReport}
+          title="Open and export CISO-level Threat Briefing PDF"
+        >
+          📄 Executive Report
+        </button>
+      </div>
     </header>
   );
 }

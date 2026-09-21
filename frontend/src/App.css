@@ -8,11 +8,12 @@
 .dashboard {
   flex: 1;
   min-height: 0;
+  min-width: 0;
   display: grid;
-  grid-template-columns: 72fr 28fr;
+  grid-template-columns: minmax(0, 68fr) minmax(360px, 32fr);
   grid-template-rows: 1fr;
   gap: 16px;
-  padding: 16px 20px 20px;
+  padding: 12px 20px 18px;
   overflow: hidden;
 }
 
@@ -20,57 +21,19 @@
   grid-column: 1;
   grid-row: 1;
   min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .dashboard__stream {
   grid-column: 2;
   grid-row: 1;
   min-height: 0;
-}
-
-/* ── Floating dock: opens Risk Cards / Auto-Fix without stealing space
-   from the graph + stream view ─────────────────────────────────────── */
-.detail-dock {
-  position: fixed;
-  right: 20px;
-  bottom: 18px;
-  z-index: 20;
+  min-width: 0;
   display: flex;
-  gap: 8px;
-}
-
-.detail-dock__btn {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  color: var(--text-bright);
-  background: var(--panel-bg-raised);
-  border: 1px solid var(--panel-border);
-  border-radius: 999px;
-  cursor: pointer;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-  transition: color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
-}
-.detail-dock__btn:hover:not(:disabled) {
-  border-color: var(--accent);
-  transform: translateY(-2px);
-}
-.detail-dock__btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.detail-dock__dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #4FA3FF;
-  animation: dot-pulse 1s ease-in-out infinite;
+  flex-direction: column;
 }
 
 /* ── Modal overlay that hosts Risk Cards / Auto-Fix on demand ──────── */
