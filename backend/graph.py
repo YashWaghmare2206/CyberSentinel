@@ -239,6 +239,9 @@ def find_attack_paths_astar(G, source, target, top_k=5):
 def find_attack_paths(G, source="api_gw_1", target="swift_terminal", algorithm="dijkstra", top_k=5):
     if algorithm == "astar":
         return find_attack_paths_astar(G, source, target, top_k)
+    elif algorithm == "pignn":
+        from pignn.inference import predict_attack_path
+        return predict_attack_path(G, source, target, top_k)
     return find_attack_paths_dijkstra(G, source, target, top_k)
 
 # --- TEST EXECUTION ---

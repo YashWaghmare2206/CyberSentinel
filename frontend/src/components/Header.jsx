@@ -18,6 +18,8 @@ export default function Header({
   onAlgorithmChange,
   onWeightingModeChange,
   onOpenReport,
+  workspace,
+  setWorkspace
 }) {
   const isBusy = status !== STATUS.IDLE && status !== STATUS.COMPLETE && status !== STATUS.ERROR;
   return (
@@ -53,6 +55,7 @@ export default function Header({
               onChange={(e) => onAlgorithmChange(e.target.value)}
               disabled={isBusy}
             >
+              <option value="pignn">Physics-Informed GNN (PIGNN)</option>
               <option value="dijkstra">Top-K Dijkstra</option>
               <option value="astar">A* Search</option>
             </select>
@@ -86,6 +89,25 @@ export default function Header({
       </div>
 
       <div className="app-header__actions">
+        <div className="workspace-toggle" style={{display: 'flex', gap: '8px', marginRight: '16px'}}>
+          <button 
+            type="button"
+            className="btn-export-report"
+            onClick={() => setWorkspace('simulation')}
+            style={{ opacity: workspace === 'simulation' ? 1 : 0.5, border: workspace === 'simulation' ? '1px solid #58a6ff' : 'none' }}
+          >
+            Simulation
+          </button>
+          <button 
+            type="button"
+            className="btn-export-report"
+            onClick={() => setWorkspace('warehouse')}
+            style={{ opacity: workspace === 'warehouse' ? 1 : 0.5, border: workspace === 'warehouse' ? '1px solid #58a6ff' : 'none' }}
+            title="DWM Data Mining & Analytics"
+          >
+            Security Intelligence
+          </button>
+        </div>
         <ControlBar status={status} STATUS={STATUS} onSimulate={onSimulate} onReset={onReset} />
         <button
           type="button"

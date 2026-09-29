@@ -17,13 +17,15 @@ import json
 import asyncio
 from typing import Optional, Dict, Any, List
 
-from fastapi import FastAPI
+from fastapi import FastAPI, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from graph import build_graph, find_attack_paths, get_dropdown_options, list_networks
 from llm import stream_attack_simulation, stream_fix_suggestions
+from warehouse.logger import build_simulation_rows, build_remediation_rows
+from warehouse.queries import get_warehouse_summary, get_attack_history, get_attack_patterns, execute_query
 
 app = FastAPI(title="CyberSentinel API")
 
@@ -49,6 +51,9 @@ class SimulateRequest(BaseModel):
 class FixRequest(BaseModel):
     attack_path: Dict[str, Any]
 
+class QueryRequest(BaseModel):
+    sql: str
+
 
 def _sse(event_type: str, data) -> str:
     """Formats one Server-Sent-Event line: {"type": ..., "data": ...}."""
@@ -68,7 +73,7 @@ def options(network_id: Optional[str] = None):
 
 
 @app.post("/simulate")
-async def simulate(req: SimulateRequest):
+async def simulate(req: SimulateRequest, background_tasks: BackgroundTasks):
     # Build graph per request based on selected network and weighting mode
     network_id = req.network_id or "enterprise-bank"
     weighting_mode = req.weighting_mode or "static"
@@ -90,6 +95,17 @@ async def simulate(req: SimulateRequest):
             yield _sse("error", paths["error"])
             yield "data: [DONE]\n\n"
         return StreamingResponse(error_stream(), media_type="text/event-stream")
+
+    # Log the simulation run to the Data Warehouse asynchronously
+    background_tasks.add_task(
+        build_simulation_rows,
+        paths=paths,
+        network_id=network_id,
+        algorithm=algorithm,
+        weighting_mode=weighting_mode,
+        entry_node=req.entry_node,
+        target_node=req.target_node
+    )
 
     # Select the requested ranked path (defaults to optimal path index 0)
     idx = req.path_index if req.path_index is not None and req.path_index < len(paths) else 0
@@ -147,7 +163,7 @@ def _node_fix(node: Dict[str, Any]) -> Dict[str, str]:
 
 
 @app.post("/fix")
-async def fix(req: FixRequest):
+async def fix(req: FixRequest, background_tasks: BackgroundTasks):
     attack_path = req.attack_path
 
     if not attack_path or not attack_path.get("nodes"):
@@ -158,6 +174,13 @@ async def fix(req: FixRequest):
 
     node_ids = attack_path.get("path", [])
     nodes = attack_path.get("nodes", [])
+
+    # Log remediation actions to the Data Warehouse asynchronously
+    background_tasks.add_task(
+        build_remediation_rows,
+        nodes=nodes,
+        network_id=attack_path.get("network_id", "enterprise-bank")
+    )
 
     async def event_generator():
         # Streams per-node node_fix events (Person 2's Task 1)
@@ -190,6 +213,26 @@ async def fix_narrative(req: FixRequest):
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
+
+@app.get("/warehouse/summary")
+def warehouse_summary():
+    return get_warehouse_summary()
+
+@app.get("/warehouse/attack-history")
+def warehouse_history():
+    return get_attack_history()
+
+@app.get("/warehouse/attack-patterns")
+def warehouse_patterns():
+    return get_attack_patterns()
+
+@app.post("/warehouse/query")
+def warehouse_query(req: QueryRequest):
+    try:
+        results = execute_query(req.sql)
+        return {"success": True, "results": results}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn

@@ -8,6 +8,7 @@ import StreamPanel from "./components/StreamPanel";
 import RiskCards from "./components/RiskCards";
 import FixPanel from "./components/FixPanel";
 import ExecutiveReportModal from "./components/ExecutiveReportModal";
+import WarehouseDashboard from "./components/warehouse/WarehouseDashboard";
 import "./App.css";
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
     reset,
   } = useSimulation();
 
+  const [workspace, setWorkspace] = useState("simulation");
   const [lowerTab, setLowerTab] = useState("risk");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
@@ -83,17 +85,23 @@ function App() {
         onAlgorithmChange={setAlgorithm}
         onWeightingModeChange={setWeightingMode}
         onOpenReport={() => setReportOpen(true)}
+        workspace={workspace}
+        setWorkspace={setWorkspace}
       />
 
-      <StepBar
-        networkId={networkId}
-        entryNode={entryNode}
-        targetNode={targetNode}
-        status={status}
-        STATUS={STATUS}
-        pathIndex={pathIndex}
-        onStepClick={handleStepClick}
-      />
+      {workspace === "warehouse" ? (
+        <WarehouseDashboard />
+      ) : (
+        <>
+          <StepBar
+            networkId={networkId}
+            entryNode={entryNode}
+            targetNode={targetNode}
+            status={status}
+            STATUS={STATUS}
+            pathIndex={pathIndex}
+            onStepClick={handleStepClick}
+          />
 
       <main className="dashboard">
         <section className="dashboard__graph">
@@ -134,8 +142,10 @@ function App() {
           />
         </section>
       </main>
+      </>
+      )}
 
-      {detailsOpen && (
+      {detailsOpen && workspace === "simulation" && (
         <div className="details-modal-backdrop" onClick={() => setDetailsOpen(false)}>
           <div
             className="details-modal"

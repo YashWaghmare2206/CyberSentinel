@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "max_nodes": 64,
+  "cvss_scale": 10.0,
+  "max_cve_log_scale": 2.99573,
+  "max_vulnerability_age_days": 3650.0,
+  "relation_count": 8,
+  "node_roles": 7,
+  "exposure_levels": 3
+}

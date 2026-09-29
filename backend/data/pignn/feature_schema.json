@@ -1,0 +1,25 @@
+{
+  "feature_dimension": 20,
+  "features": [
+    { "index": 0, "name": "role_public", "type": "one_hot", "description": "Public facing gateway or load balancer" },
+    { "index": 1, "name": "role_web_app", "type": "one_hot", "description": "Web service or application tier" },
+    { "index": 2, "name": "role_database", "type": "one_hot", "description": "Database or data storage host" },
+    { "index": 3, "name": "role_control", "type": "one_hot", "description": "Active directory or administrative console" },
+    { "index": 4, "name": "role_critical", "type": "one_hot", "description": "High value target (SWIFT, core DB, backup)" },
+    { "index": 5, "name": "role_endpoint", "type": "one_hot", "description": "Internal workstation or employee terminal" },
+    { "index": 6, "name": "role_internal", "type": "one_hot", "description": "General internal server" },
+    { "index": 7, "name": "exposure_public", "type": "one_hot", "description": "Directly accessible from Internet" },
+    { "index": 8, "name": "exposure_internal", "type": "one_hot", "description": "Accessible only within corporate LAN" },
+    { "index": 9, "name": "exposure_critical", "type": "one_hot", "description": "Segregated in restricted secure VLAN" },
+    { "index": 10, "name": "base_cvss_max", "type": "continuous", "normalization": "cvss / 10.0", "description": "Maximum NVD base CVSS score on host" },
+    { "index": 11, "name": "dwm_adjusted_score", "type": "continuous", "normalization": "dwm / 10.0", "description": "Contextually adjusted CVSS score with temporal & environmental factors" },
+    { "index": 12, "name": "cve_count", "type": "continuous", "normalization": "log1p(count) / log1p(20)", "description": "Normalized count of active vulnerabilities" },
+    { "index": 13, "name": "kev_listed", "type": "binary", "description": "1 if host has a CISA Known Exploited Vulnerability" },
+    { "index": 14, "name": "patch_unavailable", "type": "binary", "description": "1 if patch is not currently available" },
+    { "index": 15, "name": "vulnerability_age_normalized", "type": "continuous", "normalization": "days / 3650.0", "description": "Normalized vulnerability age in days" },
+    { "index": 16, "name": "in_degree_normalized", "type": "continuous", "normalization": "in_deg / max_nodes", "description": "Normalized incoming edge connectivity" },
+    { "index": 17, "name": "out_degree_normalized", "type": "continuous", "normalization": "out_deg / max_nodes", "description": "Normalized outgoing pivot opportunity" },
+    { "index": 18, "name": "is_entry_node", "type": "binary", "description": "1 if designated attacker starting host" },
+    { "index": 19, "name": "is_target_node", "type": "binary", "description": "1 if designated attacker target host" }
+  ]
+}

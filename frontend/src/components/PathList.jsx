@@ -40,6 +40,12 @@ export default function PathList({ rankedPaths, pathIndex, onSelect, status, STA
                 <span className="path-chip__hops">{p.total_hops} hops</span>
                 <span className="path-chip__dot">·</span>
                 <span className="path-chip__weight">Weight: {Number(p.total_weight).toFixed(1)}</span>
+                {p.pignn_confidence && (
+                  <>
+                    <span className="path-chip__dot">·</span>
+                    <span className="path-chip__weight" style={{color: '#ffb000'}}>PIGNN Conf: {Number(p.pignn_confidence).toFixed(1)}%</span>
+                  </>
+                )}
               </div>
             </button>
           );

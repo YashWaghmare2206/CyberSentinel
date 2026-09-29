@@ -1,0 +1,22 @@
+{
+  "relation_types": [
+    "api_call",
+    "database_access",
+    "admin_access",
+    "authentication",
+    "remote_service",
+    "firewall_control",
+    "network_route",
+    "legacy_protocol"
+  ],
+  "descriptions": {
+    "api_call": "HTTP/HTTPS REST API requests between gateways, proxies, and web services",
+    "database_access": "SQL or document queries between application tier and databases",
+    "admin_access": "Administrative management channels including SSH, RDP, and WinRM",
+    "authentication": "Identity and directory queries via LDAP, Kerberos, or Active Directory",
+    "remote_service": "Microservice RPC, NFS file shares, and SMB communications",
+    "firewall_control": "Firewall rules, packet filter modifications, and security control signals",
+    "network_route": "Base IP routing, VPN tunnels, and gateway hops",
+    "legacy_protocol": "Unencrypted or SCADA industrial protocols such as Modbus and Telnet"
+  }
+}

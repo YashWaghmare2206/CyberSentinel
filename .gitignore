@@ -2,6 +2,13 @@
 .env
 backend/.env
 frontend/.env
+*.json.key
+*gcp-key*.json
+backend/gcp-key.json
+
+# Temporary merge artifacts
+Megering/
+
 
 # Python
 venv/
