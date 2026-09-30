@@ -1,4 +1,5 @@
 import { useState } from "react";
+import InteractiveSchemaVisualizer from "../warehouse/InteractiveSchemaVisualizer";
 import "./ProjectExplainer.css";
 
 export default function ProjectExplainer({ onNavigate }) {
@@ -500,85 +501,7 @@ export default function ProjectExplainer({ onNavigate }) {
         {/* TAB 5: VISUAL STAR SCHEMA (DATA WAREHOUSE) */}
         {/* ============================================================== */}
         {activeSection === "star-schema" && (
-          <div className="v-card">
-            <div className="v-card-badge">GOOGLE BIGQUERY ARCHITECTURE</div>
-            <h2>Ralph Kimball Star Schema Visualized</h2>
-            <p className="v-desc">
-              Click any outer satellite dimension to see how it connects to our central <strong>fact_cyber_risk</strong> table:
-            </p>
-
-            <div className="v-star-interactive">
-              {/* Star Center */}
-              <div className="v-star-center">
-                <div className="v-fact-core">
-                  <span className="v-core-icon">⭐</span>
-                  <h3>fact_cyber_risk</h3>
-                  <span className="v-core-subtitle">Central Fact Table (844 Rows)</span>
-                  <div className="v-core-tags">
-                    <span>base_cvss</span>
-                    <span>edge_weight</span>
-                    <span>hop_number</span>
-                    <span>total_hops</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Orbiting Dimensions */}
-              <div className="v-star-orbit">
-                {[
-                  { id: "dim_time", name: "dim_time", icon: "⏰", desc: "Day, Month, Quarter, Year trends" },
-                  { id: "dim_node", name: "dim_node", icon: "🖥️", desc: "58 Servers, OS, exposure levels" },
-                  { id: "dim_cve", name: "dim_cve", icon: "🐛", desc: "Vulnerability catalog & CVSS scores" },
-                  { id: "dim_algorithm", name: "dim_algorithm", icon: "🧠", desc: "Dijkstra, A*, PyTorch PIGNN" },
-                  { id: "dim_simulation", name: "dim_simulation", icon: "🏃", desc: "Run IDs, entry & target pairs" },
-                ].map((dim) => (
-                  <button
-                    key={dim.id}
-                    type="button"
-                    className={`v-star-satellite ${activeStarDim === dim.id ? "active" : ""}`}
-                    onClick={() => setActiveStarDim(dim.id)}
-                  >
-                    <span className="v-sat-icon">{dim.icon}</span>
-                    <strong>{dim.name}</strong>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Dimension Detail Explainer Box */}
-            <div className="v-star-detail-panel">
-              {activeStarDim === "dim_time" && (
-                <div>
-                  <h4>⏰ Dimension: <code>dim_time</code></h4>
-                  <p>Answers time-series questions: <em>"Did our average risk score go down from Q2 to Q3 after our security team applied patches?"</em></p>
-                </div>
-              )}
-              {activeStarDim === "dim_node" && (
-                <div>
-                  <h4>🖥️ Dimension: <code>dim_node</code></h4>
-                  <p>Answers asset questions: <em>"Which physical server (e.g. DMZ Bastion Host) acts as a chokepoint across 80% of simulated attacks?"</em></p>
-                </div>
-              )}
-              {activeStarDim === "dim_cve" && (
-                <div>
-                  <h4>🐛 Dimension: <code>dim_cve</code></h4>
-                  <p>Answers vulnerability questions: <em>"Which CVE bug is the most weaponized in lateral movement routes across our enterprise?"</em></p>
-                </div>
-              )}
-              {activeStarDim === "dim_algorithm" && (
-                <div>
-                  <h4>🧠 Dimension: <code>dim_algorithm</code></h4>
-                  <p>Answers performance questions: <em>"How does our PyTorch Neural Network compare with traditional Dijkstra in path discovery depth?"</em></p>
-                </div>
-              )}
-              {activeStarDim === "dim_simulation" && (
-                <div>
-                  <h4>🏃 Dimension: <code>dim_simulation</code></h4>
-                  <p>Answers compliance & audit questions: <em>"Show all 142 simulated attacks executed over the past 30 days for CISO audit."</em></p>
-                </div>
-              )}
-            </div>
-          </div>
+          <InteractiveSchemaVisualizer />
         )}
 
         {/* ============================================================== */}
