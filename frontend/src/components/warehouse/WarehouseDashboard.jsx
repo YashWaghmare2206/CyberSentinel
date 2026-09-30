@@ -1,6 +1,5 @@
 import "./WarehouseDashboard.css";
 import WarehouseSummary from "./WarehouseSummary";
-import InteractiveSchemaVisualizer from "./InteractiveSchemaVisualizer";
 import AttackPatterns from "./AttackPatterns";
 import AttackHistory from "./AttackHistory";
 import QueryConsole from "./QueryConsole";
@@ -14,8 +13,6 @@ export default function WarehouseDashboard() {
       </div>
       
       <WarehouseSummary />
-      
-      <InteractiveSchemaVisualizer />
       
       <div className="warehouse-grid">
         <AttackPatterns />
