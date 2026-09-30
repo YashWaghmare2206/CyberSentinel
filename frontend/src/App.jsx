@@ -9,6 +9,7 @@ import RiskCards from "./components/RiskCards";
 import FixPanel from "./components/FixPanel";
 import ExecutiveReportModal from "./components/ExecutiveReportModal";
 import WarehouseDashboard from "./components/warehouse/WarehouseDashboard";
+import ProjectExplainer from "./components/explainer/ProjectExplainer";
 import "./App.css";
 
 function App() {
@@ -91,6 +92,8 @@ function App() {
 
       {workspace === "warehouse" ? (
         <WarehouseDashboard />
+      ) : workspace === "explainer" ? (
+        <ProjectExplainer onNavigate={setWorkspace} />
       ) : (
         <>
           <StepBar

@@ -107,6 +107,15 @@ export default function Header({
           >
             Security Intelligence
           </button>
+          <button 
+            type="button"
+            className="btn-export-report"
+            onClick={() => setWorkspace('explainer')}
+            style={{ opacity: workspace === 'explainer' ? 1 : 0.5, border: workspace === 'explainer' ? '1px solid #bc8cff' : 'none', color: workspace === 'explainer' ? '#bc8cff' : 'inherit' }}
+            title="Interactive Layman Guide: Explain project to anyone"
+          >
+            💡 Project Guide
+          </button>
         </div>
         <ControlBar status={status} STATUS={STATUS} onSimulate={onSimulate} onReset={onReset} />
         <button
