@@ -24,6 +24,7 @@ export default function SafetyCard({
   impact,
   fix,
   hopIndex,
+  dwmBreakdown,
 }) {
   const showAdjusted =
     adjustedScore !== undefined &&
@@ -102,6 +103,42 @@ export default function SafetyCard({
           </>
         )}
       </dl>
+
+      {/* DWM Formula Receipt */}
+      {dwmBreakdown && weightingMode === "dwm" && (
+        <details className="safety-card__dwm-receipt">
+          <summary className="safety-card__dwm-summary">
+            📐 DWM Scoring Formula — How this weight was calculated
+          </summary>
+          <div className="safety-card__dwm-body">
+            <div className="dwm-step dwm-step--base">
+              <span>Base CVSS Score (NVD)</span>
+              <strong>{dwmBreakdown.base_cvss}</strong>
+            </div>
+            {dwmBreakdown.steps.map((step, i) => (
+              <div key={i} className={`dwm-step ${step.applied ? 'dwm-step--active' : 'dwm-step--inactive'}`}>
+                <div className="dwm-step__label">
+                  {step.applied ? '✦' : '○'} {step.label}
+                  <span className="dwm-step__mult">×{step.multiplier}</span>
+                </div>
+                <div className="dwm-step__reason">{step.reason}</div>
+                <div className="dwm-step__result">→ {step.value_after}</div>
+              </div>
+            ))}
+            <div className="dwm-step dwm-step--result">
+              <span>Adjusted CVSS → Edge Weight</span>
+              <strong>{dwmBreakdown.adjusted_cvss} → {dwmBreakdown.edge_weight}</strong>
+            </div>
+            <div className={`dwm-interpretation`} style={{
+              color: dwmBreakdown.edge_weight < 1.0 ? '#f85149' :
+                     dwmBreakdown.edge_weight < 3.0 ? '#ff7b27' :
+                     dwmBreakdown.edge_weight < 6.0 ? '#d29922' : '#3fb950'
+            }}>
+              {dwmBreakdown.interpretation}
+            </div>
+          </div>
+        </details>
+      )}
     </article>
   );
 }

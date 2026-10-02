@@ -16,6 +16,7 @@ import sbCves from "./networks/small-branch-bank/cves.json" with { type: "json" 
 import iotNetwork from "./networks/legacy-iot-bank/network.json" with { type: "json" };
 import iotCves from "./networks/legacy-iot-bank/cves.json" with { type: "json" };
 
+
 const NETWORKS = {
   "enterprise-bank": { network: entNetwork, cves: entCves },
   "small-branch-bank": { network: sbNetwork, cves: sbCves },
@@ -56,6 +57,15 @@ export const NETWORK_OPTIONS = {
     destinations: {
       mainframe_terminal: "AS400 Mainframe Terminal (Core banking ledger)",
       win7_workstation: "Legacy Win7 Workstation (Administrative control)",
+    },
+  },
+  "bangladesh-heist": {
+    sources: {
+      teller_ws_bd: "BD Bank Teller Workstation (Spear-phishing — documented entry point)",
+    },
+    destinations: {
+      fedny_swift: "Federal Reserve NY SWIFT Gateway (Wire fraud — documented $81M target)",
+      swift_server_bd: "SWIFT Alliance Access Server (Messaging system)",
     },
   },
 };
@@ -214,31 +224,45 @@ export function selectPath(paths, index = 0) {
 }
 
 /**
- * Maps host and CVE details to standardized MITRE ATT&CK tactics & techniques.
+ * MITRE ATT&CK Technique Mapping
+ * Maps node types/IDs/names to known ATT&CK techniques.
+ * Source: https://attack.mitre.org/matrices/enterprise/
+ * Reference: Strom et al. (2018). MITRE ATT&CK: Design and Philosophy.
  */
-export function getMitreAttackMapping(node, cve) {
-  if (!node) return { id: "T1190", name: "Exploit Public-Facing Application", tactic: "Initial Access" };
-  const type = (node.type || "").toLowerCase();
-  const name = (node.name || "").toLowerCase();
+const MITRE_MAPPINGS = [
+  // By node ID exact match
+  { match: ["api_gw_1", "load_balancer_1", "unpatched_exchange"],
+    id: "T1190", tactic: "Initial Access", name: "Exploit Public-Facing Application" },
+  { match: ["admin_console_1", "teller_ws_bd", "teller_workstation_1"],
+    id: "T1566.001", tactic: "Initial Access", name: "Phishing: Spearphishing Attachment" },
+  { match: ["dmz_bastion", "branch_vpn_gateway", "domain_ctrl_bd"],
+    id: "T1021.004", tactic: "Lateral Movement", name: "Remote Services: SSH" },
+  { match: ["domain_ctrl_bd"],
+    id: "T1550.002", tactic: "Lateral Movement", name: "Pass the Hash" },
+  { match: ["core_db_node_1", "swift_server_bd", "swift_terminal"],
+    id: "T1078.002", tactic: "Privilege Escalation", name: "Valid Accounts: Domain Accounts" },
+  { match: ["swift_terminal", "fedny_swift"],
+    id: "T1020", tactic: "Exfiltration", name: "Automated Exfiltration" },
+  { match: ["data_warehouse"],
+    id: "T1530", tactic: "Collection", name: "Data from Cloud Storage" },
+  { match: ["atm_controller"],
+    id: "T1491", tactic: "Impact", name: "Defacement / Service Disruption" },
+  { match: ["mainframe_terminal"],
+    id: "T1486", tactic: "Impact", name: "Data Encrypted for Impact" },
+  { match: ["legacy_hvac_controller", "vault_iot_camera"],
+    id: "T1200", tactic: "Initial Access", name: "Hardware Additions (IoT)" },
+];
 
-  if (name.includes("swift") || name.includes("wire")) {
-    return { id: "T1565", name: "Data Manipulation / Financial Fraud", tactic: "Impact" };
+export function getMitreAttackMapping(node) {
+  if (!node) return null;
+  const id = (node.id || "").toLowerCase();
+  const name = (node.name || "").toLowerCase();
+  
+  for (const mapping of MITRE_MAPPINGS) {
+    if (mapping.match.some(m => id.includes(m) || name.includes(m.replace(/_/g, " ")))) {
+      return { id: mapping.id, tactic: mapping.tactic, name: mapping.name };
+    }
   }
-  if (type === "database" || name.includes("database") || name.includes("warehouse")) {
-    return { id: "T1005", name: "Data from Local System", tactic: "Collection" };
-  }
-  if (type === "auth" || type === "directory" || name.includes("admin") || name.includes("console")) {
-    return { id: "T1078", name: "Valid Accounts: Credential Abuse", tactic: "Defense Evasion" };
-  }
-  if (type === "web" || name.includes("api") || name.includes("gateway") || name.includes("vpn")) {
-    return { id: "T1190", name: "Exploit Public-Facing Application", tactic: "Initial Access" };
-  }
-  if (name.includes("waf") || name.includes("firewall") || name.includes("balancer")) {
-    return { id: "T1562", name: "Impair Defenses: Perimeter Bypass", tactic: "Defense Evasion" };
-  }
-  if (type === "internal" || name.includes("queue") || name.includes("legacy")) {
-    return { id: "T1021", name: "Remote Services: Lateral Movement", tactic: "Lateral Movement" };
-  }
-  return { id: "T1068", name: "Exploitation for Privilege Escalation", tactic: "Privilege Escalation" };
+  return null;
 }
 

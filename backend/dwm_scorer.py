@@ -113,3 +113,75 @@ def node_dwm_fields(node_cves: list, exposure: str) -> dict:
         "cvss_score": float(worst.get("cvss_score", 0.0)),
         "adjusted_weight": adjusted,
     }
+
+
+def formula_breakdown(
+    base_cvss: float,
+    kev_listed: bool = False,
+    days_since_published: int = 0,
+    patch_available: bool = True,
+    exposure: str = "internal",
+) -> dict:
+    """
+    Returns a step-by-step breakdown of how the DWM score was calculated.
+    This is the 'scoring receipt' shown in the UI per hop.
+    """
+    base_cvss = max(0.0, min(10.0, float(base_cvss or 0.0)))
+    days = max(0, int(days_since_published or 0))
+
+    kev_mult   = 1.30 if kev_listed else 1.0
+    patch_mult = 1.15 if not patch_available else 1.0
+    age_mult   = 1.10 if days > 365 else 1.0
+    env_mult   = {"public": 1.25, "internal": 1.0, "critical": 1.40}.get(exposure, 1.0)
+    
+    after_kev   = round(base_cvss * kev_mult, 2)
+    after_patch = round(after_kev * patch_mult, 2)
+    after_age   = round(after_patch * age_mult, 2)
+    final       = round(min(after_age * env_mult, 10.0), 2)
+    edge_weight = round(max(0.1, 10.0 - final), 2)
+    
+    return {
+        "base_cvss": base_cvss,
+        "steps": [
+            {
+                "label": "CISA KEV Zero-Day Multiplier",
+                "multiplier": kev_mult,
+                "value_after": after_kev,
+                "applied": kev_listed,
+                "reason": "Actively exploited in the wild — confirmed attack code exists" if kev_listed else "Not in CISA KEV catalog"
+            },
+            {
+                "label": "No Patch Available Multiplier",
+                "multiplier": patch_mult,
+                "value_after": after_patch,
+                "applied": not patch_available,
+                "reason": "Vendor has not released a fix — vulnerability stays exploitable" if not patch_available else "Patch available from vendor"
+            },
+            {
+                "label": "Old Unpatched CVE Multiplier",
+                "multiplier": age_mult,
+                "value_after": after_age,
+                "applied": days > 365,
+                "reason": f"Published {days} days ago — exploit toolkits likely exist" if days > 365 else f"Published {days} days ago — relatively recent"
+            },
+            {
+                "label": f"Exposure Multiplier ({exposure})",
+                "multiplier": env_mult,
+                "value_after": final,
+                "applied": True,
+                "reason": {
+                    "public": "Internet-facing — no firewall barrier, directly reachable",
+                    "internal": "Internal network — requires prior foothold",
+                    "critical": "Critical infrastructure — maximum blast radius"
+                }.get(exposure, "Standard internal node")
+            },
+        ],
+        "adjusted_cvss": final,
+        "edge_weight": edge_weight,
+        "interpretation": (
+            "🔴 CRITICAL — Near-zero traversal resistance" if edge_weight < 1.0 else
+            "🟠 HIGH — Low resistance, easily traversed" if edge_weight < 3.0 else
+            "🟡 MEDIUM — Moderate resistance" if edge_weight < 6.0 else
+            "🟢 LOW — High resistance, difficult to traverse"
+        )
+    }

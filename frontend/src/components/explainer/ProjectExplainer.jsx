@@ -1,6 +1,115 @@
-import { useState } from "react";
-import InteractiveSchemaVisualizer from "../warehouse/InteractiveSchemaVisualizer";
+import { useState, useEffect } from "react";
 import "./ProjectExplainer.css";
+
+function PignnMetricsPanel() {
+  const [metrics, setMetrics] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const base = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+    fetch(`${base}/pignn/metrics`)
+      .then(r => r.json())
+      .then(d => { setMetrics(d); setLoading(false); })
+      .catch(() => { setMetrics(null); setLoading(false); });
+  }, []);
+
+  if (loading) return <div className="v-metrics-loading">Loading real model metrics...</div>;
+  if (!metrics || metrics.source === "error") return null;
+
+  const isReal = metrics.source === "trained_model";
+
+  return (
+    <div className="v-real-metrics">
+      <div className="v-real-metrics__header">
+        {isReal ? "📊 Real Trained Model Metrics" : "⚠️ Architecture Only (Untrained)"}
+      </div>
+      <div className="v-real-metrics__grid">
+        {[
+          { label: "ROC-AUC", value: metrics.auc, desc: "Edge classification quality" },
+          { label: "F1-Score", value: metrics.f1, desc: "Precision-recall balance" },
+          { label: "Precision", value: metrics.precision, desc: "Correct attack edges / all predicted" },
+          { label: "Recall", value: metrics.recall, desc: "Found / all real attack edges" },
+          { label: "Cycle-Free", value: metrics.cycle_free_pct, suffix: "%", desc: "Physics constraint (no A→B→A)" },
+          { label: "Latency", value: metrics.avg_latency_ms, suffix: "ms", desc: "Inference speed" },
+        ].map(m => (
+          <div key={m.label} className="v-metric-chip" title={m.desc}>
+            <span className="v-metric-chip__label">{m.label}</span>
+            <span className="v-metric-chip__value">
+              {m.value != null ? `${Number(m.value).toFixed(3)}${m.suffix || ""}` : "N/A"}
+            </span>
+          </div>
+        ))}
+      </div>
+      {!isReal && (
+        <p className="v-metrics-note">
+          Run <code>python pignn/train.py</code> to train the model and see real metrics.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function BenchmarkPanel() {
+  const [data, setData] = useState(null);
+  
+  useEffect(() => {
+    const base = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+    fetch(`${base}/benchmark/results`)
+      .then(r => r.json())
+      .then(setData)
+      .catch(() => setData(null));
+  }, []);
+  
+  if (!data) return <div className="v-metrics-loading">Loading benchmark data...</div>;
+  if (!data.cached || !data.results?.length) {
+    return (
+      <div className="v-metrics-note">
+        Benchmark not yet run. In the backend directory, execute:
+        <code>python benchmark.py</code>
+        then restart the server.
+      </div>
+    );
+  }
+  
+  // Group by network + scenario, show first weighting mode only for clarity
+  const mainResults = data.results.filter(r => r.weighting_mode === "static");
+  
+  return (
+    <div className="v-benchmark-table-wrap">
+      <table className="v-bench-table">
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>Dijkstra Weight</th>
+            <th>Dijkstra Time</th>
+            <th>A* Weight</th>
+            <th>A* Time</th>
+            <th>A* Speedup</th>
+            <th>PIGNN Weight</th>
+            <th>PIGNN Diversity</th>
+            <th>BF Validated</th>
+          </tr>
+        </thead>
+        <tbody>
+          {mainResults.map((r, i) => (
+            <tr key={i}>
+              <td>{r.scenario}</td>
+              <td>{r.dijkstra?.optimal_weight ?? "N/A"}</td>
+              <td>{r.dijkstra?.mean_latency_ms ?? "N/A"}ms</td>
+              <td>{r.astar?.optimal_weight ?? "N/A"}</td>
+              <td>{r.astar?.mean_latency_ms ?? "N/A"}ms</td>
+              <td>{r.astar_speedup ? `${r.astar_speedup}×` : "N/A"}</td>
+              <td>{r.pignn?.optimal_weight ?? "N/A"}</td>
+              <td>{r.pignn?.avg_diversity_score ?? "N/A"}</td>
+              <td>{r.brute_force_validation ? 
+                `✅ ${r.brute_force_validation.brute_force_optimal}` : "—"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 export default function ProjectExplainer({ onNavigate }) {
   const [activeSection, setActiveSection] = useState("heist");
@@ -47,13 +156,6 @@ export default function ProjectExplainer({ onNavigate }) {
           >
             🎮 Launch 3D Simulation
           </button>
-          <button
-            type="button"
-            className="v-btn v-btn--dw"
-            onClick={() => onNavigate("warehouse")}
-          >
-            📊 Open BigQuery Warehouse
-          </button>
         </div>
       </div>
 
@@ -64,9 +166,8 @@ export default function ProjectExplainer({ onNavigate }) {
           { id: "hops", icon: "👣", label: "Hop-by-Hop Attack" },
           { id: "engines", icon: "🧠", label: "AI Engines Battle" },
           { id: "dwm-sandbox", icon: "🔐", label: "Interactive Lock Sandbox" },
-          { id: "star-schema", icon: "⭐", label: "Visual Star Schema" },
-          { id: "ai-agents", icon: "🤖", label: "AI Commentator & Doctor" },
-          { id: "cheat-sheet", icon: "🎤", label: "2-Min Viva Speech" },
+          { id: "benchmark", icon: "📊", label: "Algorithm Benchmark" },
+          { id: "ai-agents", icon: "🤖", label: "AI Commentator & Doctor" }
         ].map((tab) => (
           <button
             key={tab.id}
@@ -415,6 +516,8 @@ export default function ProjectExplainer({ onNavigate }) {
                       <strong>Deep Learning (Trained on attack patterns)</strong>
                     </div>
                   </div>
+                  {/* Real PIGNN Evaluation Metrics — from evaluate.py */}
+                  <PignnMetricsPanel />
                 </div>
               )}
             </div>
@@ -497,16 +600,23 @@ export default function ProjectExplainer({ onNavigate }) {
           </div>
         )}
 
-        {/* ============================================================== */}
-        {/* TAB 5: VISUAL STAR SCHEMA (DATA WAREHOUSE) */}
-        {/* ============================================================== */}
-        {activeSection === "star-schema" && (
-          <InteractiveSchemaVisualizer />
-        )}
 
         {/* ============================================================== */}
         {/* TAB 6: AI COMMENTATOR & DOCTOR */}
         {/* ============================================================== */}
+        {activeSection === "benchmark" && (
+          <div className="v-card">
+            <div className="v-card-badge">RESEARCH EVIDENCE</div>
+            <h2>Algorithm Comparison — Live Benchmark Results</h2>
+            <p className="v-desc">
+              These results are generated by running all 3 algorithms across all 3 network 
+              topologies and measuring real performance metrics. This is the evaluation table 
+              for the research paper.
+            </p>
+            <BenchmarkPanel />
+          </div>
+        )}
+
         {activeSection === "ai-agents" && (
           <div className="v-card">
             <div className="v-card-badge">GENERATIVE AI (GROQ / LLAMA 3.3)</div>
@@ -548,66 +658,6 @@ export default function ProjectExplainer({ onNavigate }) {
           </div>
         )}
 
-        {/* ============================================================== */}
-        {/* TAB 7: 2-MINUTE VIVA PRESENTATION SCRIPT */}
-        {/* ============================================================== */}
-        {activeSection === "cheat-sheet" && (
-          <div className="v-card">
-            <div className="v-card-badge">CONFIDENCE CHEAT SHEET</div>
-            <h2>🎤 The 2-Minute Viva Presentation Script</h2>
-            <p className="v-desc">
-              Read these 4 paragraphs word-for-word to ace any presentation or viva:
-            </p>
-
-            <div className="v-script-timeline">
-              <div className="v-script-node">
-                <div className="v-script-badge">0:00 - 0:30 • The Problem</div>
-                <h4>1. The Problem CyberSentinel Solves</h4>
-                <p>
-                  "Good morning. Our project is <strong>CyberSentinel</strong>. 
-                  In modern enterprises, cybersecurity teams are drowned in thousands of disconnected vulnerability alerts. 
-                  They know individual servers have flaws, but they cannot tell which ones an attacker can chain together 
-                  to reach critical assets like the bank's wire transfer terminal. CyberSentinel solves this by simulating 
-                  realistic, multi-hop lateral attack paths before real attackers can exploit them."
-                </p>
-              </div>
-
-              <div className="v-script-node">
-                <div className="v-script-badge">0:30 - 1:00 • 3D & AI Hybrid</div>
-                <h4>2. The 3D Engine & Physics Neural Network</h4>
-                <p>
-                  "We model the entire enterprise as an interactive 3D WebGL network graph. 
-                  To calculate attack routes, we built a hybrid engine: traditional graph algorithms like 
-                  <strong> Top-K Dijkstra and A*</strong>, plus a novel 
-                  <strong> Physics-Informed Graph Neural Network (PIGNN) in PyTorch</strong> that models attack flow 
-                  probabilistically like water finding cracks in a dam. We enrich edges with <strong>Dynamic Weight Management (DWM)</strong> 
-                  based on real-world CISA Known Exploited zero-days."
-                </p>
-              </div>
-
-              <div className="v-script-node">
-                <div className="v-script-badge">1:00 - 1:30 • GenAI Streaming</div>
-                <h4>3. Generative AI Real-Time Narration & Auto-Fix</h4>
-                <p>
-                  "When a path is computed, our integrated GenAI agent (powered by Groq and Llama 3.3) streams a play-by-play 
-                  tactical narrative of the intrusion in real time. Following the narrative, it auto-generates concrete 
-                  remediation prescriptions, specifying exact software patch versions and firewall ACL rules to neutralize each vulnerable hop."
-                </p>
-              </div>
-
-              <div className="v-script-node">
-                <div className="v-script-badge">1:30 - 2:00 • BigQuery Warehouse</div>
-                <h4>4. Enterprise Data Warehouse on Google BigQuery</h4>
-                <p>
-                  "Finally, for strategic enterprise intelligence, every simulation run is streamed asynchronously into our 
-                  <strong> Google BigQuery Data Warehouse</strong> structured in a <strong>Ralph Kimball Star Schema</strong>. 
-                  Through multidimensional OLAP querying and our interactive SQL console, security leaders can run Star Joins 
-                  to identify systemic chokepoints and audit defensive improvements over time. Thank you."
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -328,6 +328,69 @@
       "type": "critical",
       "software": "Windows 10",
       "exposure": "internal"
+    },
+    {
+      "id": "gitlab_server",
+      "name": "GitLab Source Code",
+      "type": "internal",
+      "software": "GitLab CE 13.10",
+      "exposure": "internal"
+    },
+    {
+      "id": "jenkins_ci",
+      "name": "Jenkins CI/CD",
+      "type": "internal",
+      "software": "Jenkins 2.204",
+      "exposure": "internal"
+    },
+    {
+      "id": "k8s_master",
+      "name": "K8s Control Plane",
+      "type": "internal",
+      "software": "Kubernetes 1.21",
+      "exposure": "internal"
+    },
+    {
+      "id": "k8s_worker_1",
+      "name": "K8s Worker 1",
+      "type": "internal",
+      "software": "Kubernetes 1.21",
+      "exposure": "internal"
+    },
+    {
+      "id": "hr_workstation_1",
+      "name": "HR Workstation",
+      "type": "internal",
+      "software": "Windows 10 1909",
+      "exposure": "internal"
+    },
+    {
+      "id": "hr_file_server",
+      "name": "HR File Share",
+      "type": "internal",
+      "software": "Windows Server 2016",
+      "exposure": "internal"
+    },
+    {
+      "id": "active_directory_2",
+      "name": "Backup Domain Controller",
+      "type": "critical",
+      "software": "Windows Server 2016",
+      "exposure": "internal"
+    },
+    {
+      "id": "siem_splunk",
+      "name": "Splunk Enterprise SIEM",
+      "type": "internal",
+      "software": "Splunk 8.0",
+      "exposure": "internal"
+    },
+    {
+      "id": "jump_host_2",
+      "name": "SOC Jump Host",
+      "type": "internal",
+      "software": "Ubuntu 18.04",
+      "exposure": "internal"
     }
   ],
   "edges": [
@@ -655,6 +718,114 @@
       "from": "swift_terminal",
       "to": "hsms_vault",
       "protocol": "TLS"
+    },
+    {
+      "from": "vpn_gateway_1",
+      "to": "hr_workstation_1",
+      "protocol": "RDP",
+      "description": "Remote HR employee login"
+    },
+    {
+      "from": "hr_workstation_1",
+      "to": "hr_file_server",
+      "protocol": "SMB",
+      "description": "Accessing employee records"
+    },
+    {
+      "from": "hr_file_server",
+      "to": "active_directory_2",
+      "protocol": "Kerberos",
+      "description": "Auth token request"
+    },
+    {
+      "from": "active_directory_2",
+      "to": "data_warehouse",
+      "protocol": "MSSQL",
+      "description": "AD Sync with Data Warehouse"
+    },
+    {
+      "from": "active_directory_2",
+      "to": "core_db_node_1",
+      "protocol": "MSSQL",
+      "description": "AD Sync with Core DB"
+    },
+    {
+      "from": "vpn_gateway_2",
+      "to": "gitlab_server",
+      "protocol": "HTTPS",
+      "description": "Developer committing code"
+    },
+    {
+      "from": "gitlab_server",
+      "to": "jenkins_ci",
+      "protocol": "Webhooks",
+      "description": "Trigger CI build"
+    },
+    {
+      "from": "jenkins_ci",
+      "to": "k8s_master",
+      "protocol": "HTTPS/API",
+      "description": "Deploy container"
+    },
+    {
+      "from": "k8s_master",
+      "to": "k8s_worker_1",
+      "protocol": "Kubelet API",
+      "description": "Schedule pod"
+    },
+    {
+      "from": "k8s_worker_1",
+      "to": "core_db_node_1",
+      "protocol": "TCP",
+      "description": "Microservice accessing core DB"
+    },
+    {
+      "from": "k8s_worker_1",
+      "to": "swift_terminal",
+      "protocol": "API",
+      "description": "Compromised pod reaching SWIFT network"
+    },
+    {
+      "from": "jump_host_2",
+      "to": "siem_splunk",
+      "protocol": "SSH",
+      "description": "SOC analyst access"
+    },
+    {
+      "from": "siem_splunk",
+      "to": "active_directory_1",
+      "protocol": "LDAP",
+      "description": "SIEM querying AD"
+    },
+    {
+      "from": "api_gw_2",
+      "to": "core_db_node_2",
+      "protocol": "SQL",
+      "description": "Misconfigured public exposure of DB port"
+    },
+    {
+      "from": "vpn_gateway_1",
+      "to": "msg_queue_2",
+      "protocol": "TCP",
+      "description": "Missing VPN VLAN segmentation"
+    },
+    {
+      "from": "waf_2",
+      "to": "swift_terminal",
+      "protocol": "SSH",
+      "description": "Shadow IT backdoor SSH key left on WAF"
+    },
+    {
+      "from": "load_balancer_2",
+      "to": "jump_host_1",
+      "protocol": "HTTPS",
+      "description": "Accidental routing rule exposing jump host"
+    },
+    {
+      "from": "web_app_3",
+      "to": "swift_terminal",
+      "protocol": "API",
+      "description": "Unauthenticated internal API route"
     }
   ],
   "name": "Enterprise Bank",

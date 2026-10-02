@@ -98,15 +98,7 @@ export default function Header({
           >
             Simulation
           </button>
-          <button 
-            type="button"
-            className="btn-export-report"
-            onClick={() => setWorkspace('warehouse')}
-            style={{ opacity: workspace === 'warehouse' ? 1 : 0.5, border: workspace === 'warehouse' ? '1px solid #58a6ff' : 'none' }}
-            title="DWM Data Mining & Analytics"
-          >
-            Security Intelligence
-          </button>
+
           <button 
             type="button"
             className="btn-export-report"

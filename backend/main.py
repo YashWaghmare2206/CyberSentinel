@@ -13,6 +13,7 @@ Endpoints:
     POST /fix/narrative {attack_path}       -> SSE: continuous prose stream
 """
 
+import os
 import json
 import asyncio
 from typing import Optional, Dict, Any, List
@@ -24,8 +25,8 @@ from pydantic import BaseModel
 
 from graph import build_graph, find_attack_paths, get_dropdown_options, list_networks
 from llm import stream_attack_simulation, stream_fix_suggestions
-from warehouse.logger import build_simulation_rows, build_remediation_rows
-from warehouse.queries import get_warehouse_summary, get_attack_history, get_attack_patterns, execute_query
+
+import dwm_scorer
 
 app = FastAPI(title="CyberSentinel API")
 
@@ -96,16 +97,7 @@ async def simulate(req: SimulateRequest, background_tasks: BackgroundTasks):
             yield "data: [DONE]\n\n"
         return StreamingResponse(error_stream(), media_type="text/event-stream")
 
-    # Log the simulation run to the Data Warehouse asynchronously
-    background_tasks.add_task(
-        build_simulation_rows,
-        paths=paths,
-        network_id=network_id,
-        algorithm=algorithm,
-        weighting_mode=weighting_mode,
-        entry_node=req.entry_node,
-        target_node=req.target_node
-    )
+
 
     # Select the requested ranked path (defaults to optimal path index 0)
     idx = req.path_index if req.path_index is not None and req.path_index < len(paths) else 0
@@ -175,12 +167,7 @@ async def fix(req: FixRequest, background_tasks: BackgroundTasks):
     node_ids = attack_path.get("path", [])
     nodes = attack_path.get("nodes", [])
 
-    # Log remediation actions to the Data Warehouse asynchronously
-    background_tasks.add_task(
-        build_remediation_rows,
-        nodes=nodes,
-        network_id=attack_path.get("network_id", "enterprise-bank")
-    )
+
 
     async def event_generator():
         # Streams per-node node_fix events (Person 2's Task 1)
@@ -188,7 +175,25 @@ async def fix(req: FixRequest, background_tasks: BackgroundTasks):
             await asyncio.sleep(0.35)
             node_id = node_ids[i] if i < len(node_ids) else f"node_{i}"
             fix_content = _node_fix(node)
-            yield _sse("node_fix", {"node_id": node_id, **fix_content})
+            
+            dwm_breakdown = None
+            cves = node.get("cves", [])
+            if cves and node.get("adjusted_weight"):
+                worst_cve = max(cves, key=lambda c: float(c.get("cvss_score", 0.0)))
+                dwm_breakdown = dwm_scorer.formula_breakdown(
+                    base_cvss=worst_cve.get("cvss_score", 0.0),
+                    kev_listed=bool(worst_cve.get("kev_listed", False)),
+                    days_since_published=int(worst_cve.get("days_since_published", 0) or 0),
+                    patch_available=bool(worst_cve.get("patch_available", True)),
+                    exposure=node.get("exposure", "internal"),
+                )
+
+            yield _sse("node_fix", {
+                "node_id": node_id,
+                "node_name": node.get("name", node_id),
+                "dwm_breakdown": dwm_breakdown,
+                **fix_content,
+            })
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
@@ -214,26 +219,45 @@ async def fix_narrative(req: FixRequest):
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
-@app.get("/warehouse/summary")
-def warehouse_summary():
-    return get_warehouse_summary()
 
-@app.get("/warehouse/attack-history")
-def warehouse_history():
-    return get_attack_history()
+# Cache PIGNN metrics at startup to avoid recomputing on every request
+_PIGNN_METRICS_CACHE = None
 
-@app.get("/warehouse/attack-patterns")
-def warehouse_patterns():
-    return get_attack_patterns()
-
-@app.post("/warehouse/query")
-def warehouse_query(req: QueryRequest):
+@app.get("/pignn/metrics")
+def pignn_metrics():
+    """
+    Returns pre-computed PIGNN evaluation metrics from evaluate.py.
+    Cached on first call. Returns mock metrics if weights not found.
+    """
+    global _PIGNN_METRICS_CACHE
+    if _PIGNN_METRICS_CACHE is not None:
+        return _PIGNN_METRICS_CACHE
+    
     try:
-        results = execute_query(req.sql)
-        return {"success": True, "results": results}
+        from pignn.evaluate import evaluate_pignn
+        from pignn.config import WEIGHTS_PATH
+        import os
+        if os.path.exists(WEIGHTS_PATH):
+            metrics = evaluate_pignn(WEIGHTS_PATH)
+            _PIGNN_METRICS_CACHE = {"source": "trained_model", **metrics}
+        else:
+            # Honest disclosure when weights not present
+            _PIGNN_METRICS_CACHE = {
+                "source": "architecture_only",
+                "note": "Model weights not found. Architecture validated only. Run pignn/train.py to train.",
+                "auc": None,
+                "f1": None,
+                "precision": None,
+                "recall": None,
+                "cycle_free_pct": None,
+                "avg_latency_ms": None,
+            }
     except Exception as e:
-        return {"success": False, "error": str(e)}
+        _PIGNN_METRICS_CACHE = {"source": "error", "error": str(e)}
+    
+    return _PIGNN_METRICS_CACHE
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.getenv("PORT", "8001"))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

@@ -85,28 +85,50 @@ def predict_attack_path(
         print(f"[PIGNN] Inference exception encountered: {e}. Falling back to topology search.")
 
     # Graceful fallback to Dijkstra if PIGNN had no valid path
-    from itertools import islice
+    import math as _math
+    import sys
+    sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+    from graph import _get_diverse_top_k
     try:
-        paths_gen = nx.shortest_simple_paths(G, source=source, target=target, weight="weight")
-        fallback_list = list(islice(paths_gen, top_k))
+        fallback_list = _get_diverse_top_k(G, source, target, "weight", top_k)
         results = []
         for i, path in enumerate(fallback_list):
             path_nodes = [G.nodes[n] for n in path]
             total_weight = sum(G[u][v].get("weight", 1.0) for u, v in zip(path[:-1], path[1:]))
+            
+            # Compute realistic edge probabilities from inverted edge weights
+            # weight = 10 - cvss → cvss = 10 - weight → prob ≈ cvss/10
+            edge_probs = []
+            log_prob_sum = 0.0
+            for u, v in zip(path[:-1], path[1:]):
+                w = G[u][v].get("weight", 5.0)
+                # Convert weight back to a 0-1 probability: low weight = high prob of traversal
+                prob = round(max(0.01, min(0.99, (10.0 - w) / 10.0)), 4)
+                edge_probs.append({"from": u, "to": v, "probability": prob})
+                log_prob_sum += _math.log(max(prob, 1e-6))
+            
+            num_edges = max(1, len(path) - 1)
+            geometric_mean = _math.exp(log_prob_sum / num_edges)
+            confidence_pct = round(min(99.9, geometric_mean * 100), 1)
+            
+            hop_weights = [
+                {"from_node": u, "to_node": v, "weight": round(G[u][v].get("weight", 1.0), 3)}
+                for u, v in zip(path[:-1], path[1:])
+            ]
+            
             results.append({
                 "rank": i + 1,
                 "is_optimal": (i == 0),
                 "path": path,
                 "nodes": path_nodes,
-                "total_weight": total_weight,
+                "total_weight": round(total_weight, 3),
                 "total_hops": len(path) - 1,
-                "algorithm": "pignn_fallback",
-                "pignn_confidence": 78.5,
-                "edge_probabilities": [
-                    {"from": u, "to": v, "probability": 0.8}
-                    for u, v in zip(path[:-1], path[1:])
-                ],
+                "algorithm": "pignn_fallback",       # honest labeling
+                "pignn_confidence": confidence_pct,  # computed, not hardcoded
+                "edge_probabilities": edge_probs,    # computed, not hardcoded
+                "hop_weights": hop_weights,
             })
         return results
     except nx.NetworkXNoPath:
         return {"error": f"No valid network path exists between {source} and {target}."}
+

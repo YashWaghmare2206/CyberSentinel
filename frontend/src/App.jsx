@@ -8,7 +8,7 @@ import StreamPanel from "./components/StreamPanel";
 import RiskCards from "./components/RiskCards";
 import FixPanel from "./components/FixPanel";
 import ExecutiveReportModal from "./components/ExecutiveReportModal";
-import WarehouseDashboard from "./components/warehouse/WarehouseDashboard";
+
 import ProjectExplainer from "./components/explainer/ProjectExplainer";
 import "./App.css";
 
@@ -44,7 +44,7 @@ function App() {
     reset,
   } = useSimulation();
 
-  const [workspace, setWorkspace] = useState("simulation");
+  const [workspace, setWorkspace] = useState("explainer");
   const [lowerTab, setLowerTab] = useState("risk");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
@@ -90,9 +90,7 @@ function App() {
         setWorkspace={setWorkspace}
       />
 
-      {workspace === "warehouse" ? (
-        <WarehouseDashboard />
-      ) : workspace === "explainer" ? (
+      {workspace === "explainer" ? (
         <ProjectExplainer onNavigate={setWorkspace} />
       ) : (
         <>
