@@ -1,0 +1,57 @@
+[
+  {
+    "cve_id": "CVE-2020-2021",
+    "cvss_score": 10.0,
+    "description": "SAML authentication bypass in Palo Alto PAN-OS allowing unauthenticated access with administrative privileges.",
+    "kev_listed": true,
+    "days_since_published": 1300,
+    "patch_available": true,
+    "node_id": "perimeter_firewall_dmz",
+    "exploit_type": "Authentication Bypass",
+    "patch": "Upgrade PAN-OS to 10.1.3+."
+  },
+  {
+    "cve_id": "CVE-2021-22205",
+    "cvss_score": 10.0,
+    "description": "Remote code execution in GitLab ExifTool image parser allowing unauthenticated root access to code repositories.",
+    "kev_listed": true,
+    "days_since_published": 1050,
+    "patch_available": true,
+    "node_id": "drone_firmware_repo",
+    "exploit_type": "Remote Code Execution",
+    "patch": "Upgrade GitLab to 13.10.3+."
+  },
+  {
+    "cve_id": "CVE-2020-1472",
+    "cvss_score": 10.0,
+    "description": "Zerologon: Unauthenticated privilege escalation in Netlogon cryptographic protocol to obtain Domain Admin rights.",
+    "kev_listed": true,
+    "days_since_published": 1400,
+    "patch_available": true,
+    "node_id": "corp_active_directory",
+    "exploit_type": "Cryptographic Flaw",
+    "patch": "Apply Microsoft Windows Update KB4571694."
+  },
+  {
+    "cve_id": "CVE-2022-38465",
+    "cvss_score": 8.1,
+    "description": "Hardcoded global cryptographic private key in Siemens S7-1500 PLC allowing rogue firmware modification.",
+    "kev_listed": false,
+    "days_since_published": 600,
+    "patch_available": true,
+    "node_id": "siemens_scada_plc",
+    "exploit_type": "Hardcoded Credentials",
+    "patch": "Update Siemens firmware to V2.9.4 and enable Secure PG/PC."
+  },
+  {
+    "cve_id": "CVE-2021-3449",
+    "cvss_score": 7.5,
+    "description": "NULL pointer dereference in OpenSSL server during renegotiation causing denial of service on CAD vault.",
+    "kev_listed": false,
+    "days_since_published": 1100,
+    "patch_available": true,
+    "node_id": "classified_cad_vault",
+    "exploit_type": "Denial of Service",
+    "patch": "Upgrade OpenSSL to 1.1.1k+."
+  }
+]

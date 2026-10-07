@@ -1,0 +1,73 @@
+{
+  "name": "Healthcare & Hospital System",
+  "description": "Hospital regional clinical network connecting patient portals, PACS imaging, and ICU medical devices",
+  "nodes": [
+    {
+      "id": "patient_telehealth_portal",
+      "name": "Patient Telehealth Web Portal",
+      "type": "public",
+      "exposure": "public",
+      "software": "Apache 2.4.50 / PHP 8.0"
+    },
+    {
+      "id": "hospital_lan_firewall",
+      "name": "Hospital Core LAN Firewall",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "FortiOS 6.4.4"
+    },
+    {
+      "id": "hl7_interface_engine",
+      "name": "Mirth Connect HL7 Integration Engine",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "NextGen Mirth Connect 3.9"
+    },
+    {
+      "id": "pacs_imaging_server",
+      "name": "PACS Medical DICOM Imaging Server",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "DCM4CHEE Archive 5.23"
+    },
+    {
+      "id": "nurse_station_terminal",
+      "name": "Nurse Station Care Terminal",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "Windows 10 Enterprise"
+    },
+    {
+      "id": "icu_infusion_pumps",
+      "name": "ICU Smart Infusion Pump Gateway",
+      "type": "critical",
+      "exposure": "critical",
+      "software": "Alaris Gateway Server 1.3"
+    },
+    {
+      "id": "ehr_core_database",
+      "name": "EHR Medical Records Database",
+      "type": "critical",
+      "exposure": "critical",
+      "software": "InterSystems Caché EHR DB"
+    },
+    {
+      "id": "hospital_backup_nas",
+      "name": "Hospital Immutable Backup Vault",
+      "type": "critical",
+      "exposure": "critical",
+      "software": "Synology DSM 6.2"
+    }
+  ],
+  "edges": [
+    { "from": "patient_telehealth_portal", "to": "hl7_interface_engine", "protocol": "HTTPS" },
+    { "from": "patient_telehealth_portal", "to": "hospital_lan_firewall", "protocol": "TLS" },
+    { "from": "hospital_lan_firewall", "to": "nurse_station_terminal", "protocol": "RDP" },
+    { "from": "hospital_lan_firewall", "to": "pacs_imaging_server", "protocol": "DICOM" },
+    { "from": "hl7_interface_engine", "to": "ehr_core_database", "protocol": "SQL" },
+    { "from": "nurse_station_terminal", "to": "icu_infusion_pumps", "protocol": "Proprietary" },
+    { "from": "nurse_station_terminal", "to": "ehr_core_database", "protocol": "REST" },
+    { "from": "pacs_imaging_server", "to": "ehr_core_database", "protocol": "SQL" },
+    { "from": "ehr_core_database", "to": "hospital_backup_nas", "protocol": "SMB" }
+  ]
+}

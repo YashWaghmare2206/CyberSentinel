@@ -1,0 +1,57 @@
+[
+  {
+    "cve_id": "CVE-2022-22965",
+    "cvss_score": 9.8,
+    "description": "Spring4Shell: Remote code execution in Spring Framework via classloader manipulation when deployed on cloud containers.",
+    "kev_listed": true,
+    "days_since_published": 750,
+    "patch_available": true,
+    "node_id": "k8s_ingress",
+    "exploit_type": "Remote Code Execution",
+    "patch": "Upgrade Spring Framework to 5.3.18+ or patch Nginx Ingress."
+  },
+  {
+    "cve_id": "CVE-2021-3129",
+    "cvss_score": 9.8,
+    "description": "Laravel Ignition deserialization vulnerability leading to RCE in microservice web wrapper.",
+    "kev_listed": true,
+    "days_since_published": 1100,
+    "patch_available": true,
+    "node_id": "payment_microservice",
+    "exploit_type": "Insecure Deserialization",
+    "patch": "Upgrade ignition package to 2.5.2+."
+  },
+  {
+    "cve_id": "CVE-2022-0543",
+    "cvss_score": 10.0,
+    "description": "Redis Lua sandbox escape vulnerability allowing remote execution of arbitrary OS commands.",
+    "kev_listed": true,
+    "days_since_published": 800,
+    "patch_available": true,
+    "node_id": "redis_session_cache",
+    "exploit_type": "Sandbox Escape",
+    "patch": "Upgrade Redis to 6.2.6+."
+  },
+  {
+    "cve_id": "CVE-2023-22809",
+    "cvss_score": 8.8,
+    "description": "Sudoers privilege escalation vulnerability via crafted command-line options in sudoedit.",
+    "kev_listed": true,
+    "days_since_published": 500,
+    "patch_available": true,
+    "node_id": "auth_microservice",
+    "exploit_type": "Privilege Escalation",
+    "patch": "Upgrade sudo to 1.9.12p2+."
+  },
+  {
+    "cve_id": "CVE-2022-21449",
+    "cvss_score": 7.5,
+    "description": "Psychic Signatures: ECDSA signature validation bypass in Java cryptographic library, forging settlement tokens.",
+    "kev_listed": false,
+    "days_since_published": 700,
+    "patch_available": true,
+    "node_id": "stripe_settlement_bridge",
+    "exploit_type": "Cryptographic Bypass",
+    "patch": "Upgrade OpenJDK runtime to version 17.0.3+."
+  }
+]

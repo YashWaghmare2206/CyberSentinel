@@ -1,0 +1,82 @@
+{
+  "name": "Small Branch Bank",
+  "description": "Simpler branch office network with tellers and ATMs",
+  "nodes": [
+    {
+      "id": "branch_vpn_gateway",
+      "name": "Branch VPN Gateway",
+      "type": "public",
+      "exposure": "public",
+      "software": "FortiOS"
+    },
+    {
+      "id": "teller_workstation_1",
+      "name": "Teller Workstation 1",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "Windows 10"
+    },
+    {
+      "id": "teller_workstation_2",
+      "name": "Teller Workstation 2",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "Windows 10"
+    },
+    {
+      "id": "branch_file_server",
+      "name": "Branch File Server",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "Windows Server 2019"
+    },
+    {
+      "id": "vault_iot_camera",
+      "name": "Vault IP Camera",
+      "type": "legacy",
+      "exposure": "internal",
+      "software": "Hikvision"
+    },
+    {
+      "id": "atm_controller",
+      "name": "ATM Controller",
+      "type": "critical",
+      "exposure": "critical",
+      "software": "Windows Embedded"
+    }
+  ],
+  "edges": [
+    {
+      "from": "branch_vpn_gateway",
+      "to": "teller_workstation_1"
+    },
+    {
+      "from": "branch_vpn_gateway",
+      "to": "teller_workstation_2"
+    },
+    {
+      "from": "branch_vpn_gateway",
+      "to": "branch_file_server"
+    },
+    {
+      "from": "teller_workstation_1",
+      "to": "branch_file_server"
+    },
+    {
+      "from": "teller_workstation_2",
+      "to": "branch_file_server"
+    },
+    {
+      "from": "branch_file_server",
+      "to": "atm_controller"
+    },
+    {
+      "from": "teller_workstation_1",
+      "to": "vault_iot_camera"
+    },
+    {
+      "from": "vault_iot_camera",
+      "to": "atm_controller"
+    }
+  ]
+}

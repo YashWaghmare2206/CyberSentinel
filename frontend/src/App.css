@@ -1,0 +1,312 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg, #070b12);
+  color: var(--text, #c9d1d9);
+}
+
+.dashboard {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 58fr) minmax(420px, 42fr);
+  grid-template-rows: 1fr;
+  gap: 16px;
+  padding: 12px 20px 18px;
+  overflow: hidden;
+}
+
+.dashboard__graph {
+  grid-column: 1;
+  grid-row: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--panel-bg, #0a1120);
+  border: 1px solid var(--panel-border, #1b263b);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.dashboard__console {
+  grid-column: 2;
+  grid-row: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel-bg, #0a1120);
+  border: 1px solid var(--panel-border, #1b263b);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ── Console Header & Tab Navigation ───────────────────────────────── */
+.console-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: rgba(13, 21, 38, 0.7);
+  border-bottom: 1px solid var(--panel-border, #1b263b);
+  gap: 12px;
+}
+
+.console-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.console-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #8b949e;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.console-tab:hover {
+  color: #f0f6fc;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.console-tab.is-active {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.console-tab__num {
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+.console-tab__badge {
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #38bdf8;
+  color: #070b12;
+  font-weight: 700;
+}
+
+.console-tab__count {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: #f43f5e;
+  color: #fff;
+  font-weight: 700;
+}
+
+.console-tab__pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  animation: pulse-dot 1.2s infinite;
+}
+
+.console-tab__pulse.red {
+  background: #f43f5e;
+  box-shadow: 0 0 8px #f43f5e;
+}
+
+.console-tab__pulse.blue {
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.3); }
+}
+
+.console-header__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.console-meta-pignn {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  color: #a855f7;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.console-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Floating Dock at Bottom ───────────────────────────────────────── */
+.detail-dock {
+  position: fixed;
+  bottom: 24px;
+  right: 28px;
+  display: flex;
+  gap: 10px;
+  z-index: 20;
+}
+
+.detail-dock__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #c9d1d9;
+  background: rgba(13, 21, 38, 0.85);
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+}
+
+.detail-dock__btn:hover:not(:disabled) {
+  color: #f0f6fc;
+  border-color: #38bdf8;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(56, 189, 248, 0.2);
+}
+
+.detail-dock__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.detail-dock__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 6px #38bdf8;
+}
+
+/* ── Details Fullscreen Modal ──────────────────────────────────────── */
+.details-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(3, 7, 18, 0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+}
+
+.details-modal {
+  width: min(1200px, 94vw);
+  height: 84vh;
+  display: flex;
+  flex-direction: column;
+  background: #0a1120;
+  border: 1px solid #1e293b;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+
+.details-modal__tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px;
+  background: #0d1526;
+  border-bottom: 1px solid #1e293b;
+}
+
+.lower-tabs__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #8b949e;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lower-tabs__btn:hover:not(:disabled) {
+  color: #f0f6fc;
+}
+
+.lower-tabs__btn.is-active {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.details-modal__close {
+  margin-left: auto;
+  padding: 6px 12px;
+  color: #8b949e;
+  background: transparent;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.details-modal__close:hover {
+  color: #f0f6fc;
+  border-color: #f43f5e;
+}
+
+.details-modal__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.lower-tabs__pane {
+  display: none;
+}
+
+.lower-tabs__pane.is-active {
+  display: block;
+}
+
+@media (max-width: 1024px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+    grid-template-rows: 55vh minmax(320px, 1fr);
+    overflow-y: auto;
+  }
+  .dashboard__graph { grid-column: 1; grid-row: 1; }
+  .dashboard__console { grid-column: 1; grid-row: 2; }
+}

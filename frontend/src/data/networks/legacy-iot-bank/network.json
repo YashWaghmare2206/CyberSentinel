@@ -1,0 +1,63 @@
+{
+  "name": "Legacy IoT Bank",
+  "description": "Acquired legacy infrastructure heavily reliant on outdated hardware",
+  "nodes": [
+    {
+      "id": "unpatched_exchange",
+      "name": "Legacy Exchange Server",
+      "type": "public",
+      "exposure": "public",
+      "software": "Microsoft Exchange"
+    },
+    {
+      "id": "legacy_hvac_controller",
+      "name": "Building HVAC BMS",
+      "type": "public",
+      "exposure": "public",
+      "software": "Tridium Niagara"
+    },
+    {
+      "id": "legacy_pbx_system",
+      "name": "VoIP PBX Server",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "Asterisk"
+    },
+    {
+      "id": "win7_workstation",
+      "name": "Legacy Win7 Workstation",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "Windows 7"
+    },
+    {
+      "id": "mainframe_terminal",
+      "name": "AS400 Mainframe Term",
+      "type": "critical",
+      "exposure": "critical",
+      "software": "IBM i"
+    }
+  ],
+  "edges": [
+    {
+      "from": "unpatched_exchange",
+      "to": "legacy_pbx_system"
+    },
+    {
+      "from": "legacy_hvac_controller",
+      "to": "win7_workstation"
+    },
+    {
+      "from": "unpatched_exchange",
+      "to": "win7_workstation"
+    },
+    {
+      "from": "win7_workstation",
+      "to": "mainframe_terminal"
+    },
+    {
+      "from": "legacy_pbx_system",
+      "to": "mainframe_terminal"
+    }
+  ]
+}

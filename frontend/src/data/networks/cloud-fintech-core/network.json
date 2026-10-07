@@ -1,0 +1,82 @@
+{
+  "name": "Cloud FinTech Core",
+  "description": "AWS & Kubernetes-hosted cloud-native banking and payment processing architecture",
+  "nodes": [
+    {
+      "id": "cloud_api_gw",
+      "name": "AWS Public API Gateway",
+      "type": "public",
+      "exposure": "public",
+      "software": "Amazon API Gateway v2"
+    },
+    {
+      "id": "cognito_auth",
+      "name": "AWS Cognito Identity Provider",
+      "type": "public",
+      "exposure": "public",
+      "software": "AWS Cognito OAuth2"
+    },
+    {
+      "id": "k8s_ingress",
+      "name": "Kubernetes Ingress Controller",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "Nginx Ingress 1.4.0"
+    },
+    {
+      "id": "payment_microservice",
+      "name": "Payment Microservice Pod",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "Node.js Express 4.16"
+    },
+    {
+      "id": "auth_microservice",
+      "name": "IAM Token Service Pod",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "Go Gin Microservice 1.7"
+    },
+    {
+      "id": "redis_session_cache",
+      "name": "Redis ElastiCache Cluster",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "Redis 6.2.5"
+    },
+    {
+      "id": "dynamodb_customer_vault",
+      "name": "DynamoDB Customer Vault",
+      "type": "critical",
+      "exposure": "critical",
+      "software": "Amazon DynamoDB"
+    },
+    {
+      "id": "s3_pii_datalake",
+      "name": "S3 Encrypted Customer DataLake",
+      "type": "critical",
+      "exposure": "critical",
+      "software": "Amazon S3 KMS"
+    },
+    {
+      "id": "stripe_settlement_bridge",
+      "name": "Stripe & HSM Wire Settlement Gateway",
+      "type": "critical",
+      "exposure": "critical",
+      "software": "Stripe Gateway HSM Agent"
+    }
+  ],
+  "edges": [
+    { "from": "cloud_api_gw", "to": "cognito_auth", "protocol": "HTTPS" },
+    { "from": "cloud_api_gw", "to": "k8s_ingress", "protocol": "TLS" },
+    { "from": "cognito_auth", "to": "auth_microservice", "protocol": "REST" },
+    { "from": "k8s_ingress", "to": "payment_microservice", "protocol": "HTTP" },
+    { "from": "k8s_ingress", "to": "auth_microservice", "protocol": "HTTP" },
+    { "from": "auth_microservice", "to": "redis_session_cache", "protocol": "Redis" },
+    { "from": "payment_microservice", "to": "redis_session_cache", "protocol": "Redis" },
+    { "from": "payment_microservice", "to": "dynamodb_customer_vault", "protocol": "HTTPS" },
+    { "from": "auth_microservice", "to": "s3_pii_datalake", "protocol": "HTTPS" },
+    { "from": "dynamodb_customer_vault", "to": "stripe_settlement_bridge", "protocol": "TLS" },
+    { "from": "payment_microservice", "to": "stripe_settlement_bridge", "protocol": "REST" }
+  ]
+}

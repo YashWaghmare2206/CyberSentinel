@@ -1,0 +1,686 @@
+[
+  {
+    "network": "enterprise-bank",
+    "scenario": "Public API \u2192 SWIFT (Main Scenario)",
+    "source": "api_gw_1",
+    "target": "swift_terminal",
+    "weighting_mode": "static",
+    "dijkstra": {
+      "optimal_weight": 4.4,
+      "optimal_hops": 4,
+      "paths_found": 5,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.71,
+      "min_latency_ms": 0.55,
+      "max_latency_ms": 0.84
+    },
+    "astar": {
+      "optimal_weight": 4.4,
+      "optimal_hops": 4,
+      "paths_found": 5,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.75,
+      "min_latency_ms": 0.62,
+      "max_latency_ms": 1.2
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 0.95,
+    "pignn": {
+      "optimal_weight": 4.9,
+      "optimal_hops": 4,
+      "paths_found": 5,
+      "avg_diversity_score": 0.343,
+      "mean_latency_ms": 845.01,
+      "min_latency_ms": 10.22,
+      "max_latency_ms": 4179.18
+    },
+    "brute_force_validation": null
+  },
+  {
+    "network": "enterprise-bank",
+    "scenario": "Public API \u2192 SWIFT (Main Scenario)",
+    "source": "api_gw_1",
+    "target": "swift_terminal",
+    "weighting_mode": "dwm",
+    "dijkstra": {
+      "optimal_weight": 0.51,
+      "optimal_hops": 4,
+      "paths_found": 5,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.81,
+      "min_latency_ms": 0.76,
+      "max_latency_ms": 0.87
+    },
+    "astar": {
+      "optimal_weight": 0.51,
+      "optimal_hops": 4,
+      "paths_found": 5,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.85,
+      "min_latency_ms": 0.81,
+      "max_latency_ms": 0.91
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 0.95,
+    "pignn": {
+      "optimal_weight": 0.51,
+      "optimal_hops": 4,
+      "paths_found": 5,
+      "avg_diversity_score": 0.343,
+      "mean_latency_ms": 11.88,
+      "min_latency_ms": 11.59,
+      "max_latency_ms": 12.79
+    },
+    "brute_force_validation": null
+  },
+  {
+    "network": "enterprise-bank",
+    "scenario": "Public API \u2192 SWIFT (Main Scenario)",
+    "source": "api_gw_1",
+    "target": "swift_terminal",
+    "weighting_mode": "ml",
+    "dijkstra": {
+      "optimal_weight": 0.4,
+      "optimal_hops": 4,
+      "paths_found": 5,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.88,
+      "min_latency_ms": 0.62,
+      "max_latency_ms": 1.06
+    },
+    "astar": {
+      "optimal_weight": 0.4,
+      "optimal_hops": 4,
+      "paths_found": 5,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.92,
+      "min_latency_ms": 0.9,
+      "max_latency_ms": 0.95
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 0.96,
+    "pignn": {
+      "optimal_weight": 0.4,
+      "optimal_hops": 4,
+      "paths_found": 5,
+      "avg_diversity_score": 0.343,
+      "mean_latency_ms": 11.05,
+      "min_latency_ms": 10.49,
+      "max_latency_ms": 11.62
+    },
+    "brute_force_validation": null
+  },
+  {
+    "network": "enterprise-bank",
+    "scenario": "Admin Console \u2192 Data Warehouse",
+    "source": "admin_console_1",
+    "target": "data_warehouse",
+    "weighting_mode": "static",
+    "dijkstra": {
+      "optimal_weight": 1.1,
+      "optimal_hops": 1,
+      "paths_found": 4,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.46,
+      "min_latency_ms": 0.34,
+      "max_latency_ms": 0.62
+    },
+    "astar": {
+      "optimal_weight": 1.1,
+      "optimal_hops": 1,
+      "paths_found": 4,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.44,
+      "min_latency_ms": 0.38,
+      "max_latency_ms": 0.49
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 1.05,
+    "pignn": {
+      "optimal_weight": 1.1,
+      "optimal_hops": 1,
+      "paths_found": 4,
+      "avg_diversity_score": 0.66,
+      "mean_latency_ms": 12.45,
+      "min_latency_ms": 11.06,
+      "max_latency_ms": 14.9
+    },
+    "brute_force_validation": null
+  },
+  {
+    "network": "enterprise-bank",
+    "scenario": "Admin Console \u2192 Data Warehouse",
+    "source": "admin_console_1",
+    "target": "data_warehouse",
+    "weighting_mode": "dwm",
+    "dijkstra": {
+      "optimal_weight": 0.21,
+      "optimal_hops": 1,
+      "paths_found": 4,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.49,
+      "min_latency_ms": 0.38,
+      "max_latency_ms": 0.69
+    },
+    "astar": {
+      "optimal_weight": 0.21,
+      "optimal_hops": 1,
+      "paths_found": 4,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.62,
+      "min_latency_ms": 0.51,
+      "max_latency_ms": 0.75
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 0.79,
+    "pignn": {
+      "optimal_weight": 0.21,
+      "optimal_hops": 1,
+      "paths_found": 4,
+      "avg_diversity_score": 0.66,
+      "mean_latency_ms": 12.76,
+      "min_latency_ms": 11.38,
+      "max_latency_ms": 13.83
+    },
+    "brute_force_validation": null
+  },
+  {
+    "network": "enterprise-bank",
+    "scenario": "Admin Console \u2192 Data Warehouse",
+    "source": "admin_console_1",
+    "target": "data_warehouse",
+    "weighting_mode": "ml",
+    "dijkstra": {
+      "optimal_weight": 0.1,
+      "optimal_hops": 1,
+      "paths_found": 4,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.51,
+      "min_latency_ms": 0.48,
+      "max_latency_ms": 0.58
+    },
+    "astar": {
+      "optimal_weight": 0.1,
+      "optimal_hops": 1,
+      "paths_found": 4,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.56,
+      "min_latency_ms": 0.54,
+      "max_latency_ms": 0.6
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 0.91,
+    "pignn": {
+      "optimal_weight": 0.1,
+      "optimal_hops": 1,
+      "paths_found": 4,
+      "avg_diversity_score": 0.66,
+      "mean_latency_ms": 11.6,
+      "min_latency_ms": 9.9,
+      "max_latency_ms": 13.33
+    },
+    "brute_force_validation": null
+  },
+  {
+    "network": "enterprise-bank",
+    "scenario": "Load Balancer \u2192 Core DB",
+    "source": "load_balancer_1",
+    "target": "core_db_node_1",
+    "weighting_mode": "static",
+    "dijkstra": {
+      "optimal_weight": 5.5,
+      "optimal_hops": 5,
+      "paths_found": 5,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 1.0,
+      "min_latency_ms": 0.97,
+      "max_latency_ms": 1.07
+    },
+    "astar": {
+      "optimal_weight": 5.5,
+      "optimal_hops": 5,
+      "paths_found": 5,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 1.16,
+      "min_latency_ms": 1.06,
+      "max_latency_ms": 1.25
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 0.86,
+    "pignn": {
+      "optimal_weight": 5.5,
+      "optimal_hops": 5,
+      "paths_found": 5,
+      "avg_diversity_score": 0.214,
+      "mean_latency_ms": 11.79,
+      "min_latency_ms": 11.04,
+      "max_latency_ms": 12.43
+    },
+    "brute_force_validation": null
+  },
+  {
+    "network": "enterprise-bank",
+    "scenario": "Load Balancer \u2192 Core DB",
+    "source": "load_balancer_1",
+    "target": "core_db_node_1",
+    "weighting_mode": "dwm",
+    "dijkstra": {
+      "optimal_weight": 2.63,
+      "optimal_hops": 5,
+      "paths_found": 5,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.81,
+      "min_latency_ms": 0.68,
+      "max_latency_ms": 1.0
+    },
+    "astar": {
+      "optimal_weight": 2.63,
+      "optimal_hops": 5,
+      "paths_found": 5,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.89,
+      "min_latency_ms": 0.77,
+      "max_latency_ms": 1.07
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 0.91,
+    "pignn": {
+      "optimal_weight": 2.63,
+      "optimal_hops": 5,
+      "paths_found": 5,
+      "avg_diversity_score": 0.214,
+      "mean_latency_ms": 11.69,
+      "min_latency_ms": 10.49,
+      "max_latency_ms": 13.35
+    },
+    "brute_force_validation": null
+  },
+  {
+    "network": "enterprise-bank",
+    "scenario": "Load Balancer \u2192 Core DB",
+    "source": "load_balancer_1",
+    "target": "core_db_node_1",
+    "weighting_mode": "ml",
+    "dijkstra": {
+      "optimal_weight": 0.82,
+      "optimal_hops": 5,
+      "paths_found": 5,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.99,
+      "min_latency_ms": 0.95,
+      "max_latency_ms": 1.11
+    },
+    "astar": {
+      "optimal_weight": 0.82,
+      "optimal_hops": 5,
+      "paths_found": 5,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 1.17,
+      "min_latency_ms": 1.06,
+      "max_latency_ms": 1.34
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 0.85,
+    "pignn": {
+      "optimal_weight": 0.82,
+      "optimal_hops": 5,
+      "paths_found": 5,
+      "avg_diversity_score": 0.214,
+      "mean_latency_ms": 10.94,
+      "min_latency_ms": 10.17,
+      "max_latency_ms": 11.94
+    },
+    "brute_force_validation": null
+  },
+  {
+    "network": "small-branch-bank",
+    "scenario": "VPN Gateway \u2192 ATM Controller",
+    "source": "branch_vpn_gateway",
+    "target": "atm_controller",
+    "weighting_mode": "static",
+    "dijkstra": {
+      "optimal_weight": 4.7,
+      "optimal_hops": 2,
+      "paths_found": 4,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.17,
+      "min_latency_ms": 0.14,
+      "max_latency_ms": 0.29
+    },
+    "astar": {
+      "optimal_weight": 4.7,
+      "optimal_hops": 2,
+      "paths_found": 4,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.28,
+      "min_latency_ms": 0.23,
+      "max_latency_ms": 0.34
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 0.61,
+    "pignn": {
+      "optimal_weight": 7.2,
+      "optimal_hops": 3,
+      "paths_found": 4,
+      "avg_diversity_score": 0.35,
+      "mean_latency_ms": 9.73,
+      "min_latency_ms": 8.79,
+      "max_latency_ms": 10.38
+    },
+    "brute_force_validation": {
+      "brute_force_optimal": 4.7,
+      "total_paths_found": 4
+    }
+  },
+  {
+    "network": "small-branch-bank",
+    "scenario": "VPN Gateway \u2192 ATM Controller",
+    "source": "branch_vpn_gateway",
+    "target": "atm_controller",
+    "weighting_mode": "dwm",
+    "dijkstra": {
+      "optimal_weight": 1.12,
+      "optimal_hops": 3,
+      "paths_found": 4,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.19,
+      "min_latency_ms": 0.16,
+      "max_latency_ms": 0.24
+    },
+    "astar": {
+      "optimal_weight": 1.12,
+      "optimal_hops": 3,
+      "paths_found": 4,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.21,
+      "min_latency_ms": 0.17,
+      "max_latency_ms": 0.25
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 0.9,
+    "pignn": {
+      "optimal_weight": 2.03,
+      "optimal_hops": 3,
+      "paths_found": 4,
+      "avg_diversity_score": 0.35,
+      "mean_latency_ms": 11.71,
+      "min_latency_ms": 9.91,
+      "max_latency_ms": 12.76
+    },
+    "brute_force_validation": {
+      "brute_force_optimal": 1.12,
+      "total_paths_found": 4
+    }
+  },
+  {
+    "network": "small-branch-bank",
+    "scenario": "VPN Gateway \u2192 ATM Controller",
+    "source": "branch_vpn_gateway",
+    "target": "atm_controller",
+    "weighting_mode": "ml",
+    "dijkstra": {
+      "optimal_weight": 0.3,
+      "optimal_hops": 3,
+      "paths_found": 4,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.18,
+      "min_latency_ms": 0.14,
+      "max_latency_ms": 0.25
+    },
+    "astar": {
+      "optimal_weight": 0.3,
+      "optimal_hops": 3,
+      "paths_found": 4,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.18,
+      "min_latency_ms": 0.17,
+      "max_latency_ms": 0.22
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 1.0,
+    "pignn": {
+      "optimal_weight": 0.43,
+      "optimal_hops": 3,
+      "paths_found": 4,
+      "avg_diversity_score": 0.35,
+      "mean_latency_ms": 9.72,
+      "min_latency_ms": 8.58,
+      "max_latency_ms": 11.44
+    },
+    "brute_force_validation": {
+      "brute_force_optimal": 0.3,
+      "total_paths_found": 4
+    }
+  },
+  {
+    "network": "small-branch-bank",
+    "scenario": "Teller WS \u2192 File Server",
+    "source": "teller_workstation_1",
+    "target": "branch_file_server",
+    "weighting_mode": "static",
+    "dijkstra": {
+      "optimal_weight": 2.2,
+      "optimal_hops": 1,
+      "paths_found": 1,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.04,
+      "min_latency_ms": 0.03,
+      "max_latency_ms": 0.09
+    },
+    "astar": {
+      "optimal_weight": 2.2,
+      "optimal_hops": 1,
+      "paths_found": 1,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.06,
+      "min_latency_ms": 0.05,
+      "max_latency_ms": 0.1
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 0.67,
+    "pignn": {
+      "optimal_weight": 2.2,
+      "optimal_hops": 1,
+      "paths_found": 1,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 10.41,
+      "min_latency_ms": 8.79,
+      "max_latency_ms": 11.42
+    },
+    "brute_force_validation": {
+      "brute_force_optimal": 2.2,
+      "total_paths_found": 1
+    }
+  },
+  {
+    "network": "small-branch-bank",
+    "scenario": "Teller WS \u2192 File Server",
+    "source": "teller_workstation_1",
+    "target": "branch_file_server",
+    "weighting_mode": "dwm",
+    "dijkstra": {
+      "optimal_weight": 1.42,
+      "optimal_hops": 1,
+      "paths_found": 1,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.04,
+      "min_latency_ms": 0.03,
+      "max_latency_ms": 0.07
+    },
+    "astar": {
+      "optimal_weight": 1.42,
+      "optimal_hops": 1,
+      "paths_found": 1,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.05,
+      "min_latency_ms": 0.04,
+      "max_latency_ms": 0.08
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 0.8,
+    "pignn": {
+      "optimal_weight": 1.42,
+      "optimal_hops": 1,
+      "paths_found": 1,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 7.66,
+      "min_latency_ms": 6.44,
+      "max_latency_ms": 9.05
+    },
+    "brute_force_validation": {
+      "brute_force_optimal": 1.42,
+      "total_paths_found": 1
+    }
+  },
+  {
+    "network": "small-branch-bank",
+    "scenario": "Teller WS \u2192 File Server",
+    "source": "teller_workstation_1",
+    "target": "branch_file_server",
+    "weighting_mode": "ml",
+    "dijkstra": {
+      "optimal_weight": 0.23,
+      "optimal_hops": 1,
+      "paths_found": 1,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.04,
+      "min_latency_ms": 0.02,
+      "max_latency_ms": 0.07
+    },
+    "astar": {
+      "optimal_weight": 0.23,
+      "optimal_hops": 1,
+      "paths_found": 1,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.05,
+      "min_latency_ms": 0.04,
+      "max_latency_ms": 0.07
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 0.8,
+    "pignn": {
+      "optimal_weight": 0.23,
+      "optimal_hops": 1,
+      "paths_found": 1,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 7.55,
+      "min_latency_ms": 6.88,
+      "max_latency_ms": 8.12
+    },
+    "brute_force_validation": {
+      "brute_force_optimal": 0.23,
+      "total_paths_found": 1
+    }
+  },
+  {
+    "network": "legacy-iot-bank",
+    "scenario": "Exchange \u2192 Mainframe",
+    "source": "unpatched_exchange",
+    "target": "mainframe_terminal",
+    "weighting_mode": "static",
+    "dijkstra": {
+      "optimal_weight": 5.0,
+      "optimal_hops": 2,
+      "paths_found": 2,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.08,
+      "min_latency_ms": 0.05,
+      "max_latency_ms": 0.16
+    },
+    "astar": {
+      "optimal_weight": 5.0,
+      "optimal_hops": 2,
+      "paths_found": 2,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.09,
+      "min_latency_ms": 0.07,
+      "max_latency_ms": 0.14
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 0.89,
+    "pignn": {
+      "optimal_weight": 5.0,
+      "optimal_hops": 2,
+      "paths_found": 2,
+      "avg_diversity_score": 0.5,
+      "mean_latency_ms": 8.08,
+      "min_latency_ms": 7.39,
+      "max_latency_ms": 8.62
+    },
+    "brute_force_validation": null
+  },
+  {
+    "network": "legacy-iot-bank",
+    "scenario": "Exchange \u2192 Mainframe",
+    "source": "unpatched_exchange",
+    "target": "mainframe_terminal",
+    "weighting_mode": "dwm",
+    "dijkstra": {
+      "optimal_weight": 1.85,
+      "optimal_hops": 2,
+      "paths_found": 2,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.07,
+      "min_latency_ms": 0.05,
+      "max_latency_ms": 0.1
+    },
+    "astar": {
+      "optimal_weight": 1.85,
+      "optimal_hops": 2,
+      "paths_found": 2,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.08,
+      "min_latency_ms": 0.07,
+      "max_latency_ms": 0.11
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 0.88,
+    "pignn": {
+      "optimal_weight": 1.85,
+      "optimal_hops": 2,
+      "paths_found": 2,
+      "avg_diversity_score": 0.5,
+      "mean_latency_ms": 7.49,
+      "min_latency_ms": 6.75,
+      "max_latency_ms": 8.47
+    },
+    "brute_force_validation": null
+  },
+  {
+    "network": "legacy-iot-bank",
+    "scenario": "Exchange \u2192 Mainframe",
+    "source": "unpatched_exchange",
+    "target": "mainframe_terminal",
+    "weighting_mode": "ml",
+    "dijkstra": {
+      "optimal_weight": 0.45,
+      "optimal_hops": 2,
+      "paths_found": 2,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.07,
+      "min_latency_ms": 0.06,
+      "max_latency_ms": 0.11
+    },
+    "astar": {
+      "optimal_weight": 0.45,
+      "optimal_hops": 2,
+      "paths_found": 2,
+      "avg_diversity_score": 0.0,
+      "mean_latency_ms": 0.07,
+      "min_latency_ms": 0.05,
+      "max_latency_ms": 0.11
+    },
+    "astar_quality_ratio": 1.0,
+    "astar_speedup": 1.0,
+    "pignn": {
+      "optimal_weight": 0.45,
+      "optimal_hops": 2,
+      "paths_found": 2,
+      "avg_diversity_score": 0.5,
+      "mean_latency_ms": 7.48,
+      "min_latency_ms": 6.97,
+      "max_latency_ms": 8.01
+    },
+    "brute_force_validation": null
+  }
+]

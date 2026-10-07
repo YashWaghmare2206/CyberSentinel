@@ -1,0 +1,32 @@
+# Environment secrets — never commit
+.env
+backend/.env
+frontend/.env
+*.json.key
+*gcp-key*.json
+backend/gcp-key.json
+
+# Temporary merge artifacts
+Megering/
+
+
+# Python
+venv/
+.venv/
+backend/venv/
+backend/.venv/
+__pycache__/
+*.pyc
+
+# Node / frontend
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store

@@ -1,0 +1,57 @@
+[
+  {
+    "cve_id": "CVE-2021-42013",
+    "cvss_score": 9.8,
+    "description": "Path traversal and remote code execution in Apache HTTP Server 2.4.50 allowing arbitrary command execution.",
+    "kev_listed": true,
+    "days_since_published": 1000,
+    "patch_available": true,
+    "node_id": "patient_telehealth_portal",
+    "exploit_type": "Path Traversal & RCE",
+    "patch": "Upgrade Apache to version 2.4.51 or later."
+  },
+  {
+    "cve_id": "CVE-2023-43208",
+    "cvss_score": 9.8,
+    "description": "Unauthenticated remote code execution in NextGen Mirth Connect HL7 engine via XML deserialization.",
+    "kev_listed": true,
+    "days_since_published": 350,
+    "patch_available": true,
+    "node_id": "hl7_interface_engine",
+    "exploit_type": "XML Deserialization RCE",
+    "patch": "Upgrade Mirth Connect to 4.4.1+."
+  },
+  {
+    "cve_id": "CVE-2020-12812",
+    "cvss_score": 9.8,
+    "description": "FortiOS SSL-VPN two-factor authentication bypass allowing remote login without 2FA token.",
+    "kev_listed": true,
+    "days_since_published": 1400,
+    "patch_available": true,
+    "node_id": "hospital_lan_firewall",
+    "exploit_type": "Authentication Bypass",
+    "patch": "Upgrade FortiOS to version 6.4.5+."
+  },
+  {
+    "cve_id": "CVE-2020-25165",
+    "cvss_score": 7.5,
+    "description": "Unauthenticated firmware modification flaw in BD Alaris infusion pump gateway allowing dose manipulation.",
+    "kev_listed": false,
+    "days_since_published": 1300,
+    "patch_available": true,
+    "node_id": "icu_infusion_pumps",
+    "exploit_type": "Firmware Tampering",
+    "patch": "Apply vendor remediation firmware update 1.3.3.2."
+  },
+  {
+    "cve_id": "CVE-2021-31805",
+    "cvss_score": 9.8,
+    "description": "Apache Struts remote code execution vulnerability impacting EHR medical records report generation portal.",
+    "kev_listed": true,
+    "days_since_published": 800,
+    "patch_available": true,
+    "node_id": "ehr_core_database",
+    "exploit_type": "Remote Code Execution",
+    "patch": "Upgrade Apache Struts to 2.5.30+."
+  }
+]

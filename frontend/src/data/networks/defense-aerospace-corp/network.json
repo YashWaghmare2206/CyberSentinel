@@ -1,0 +1,80 @@
+{
+  "name": "Defense & Aerospace Corp",
+  "description": "Critical defense manufacturing, satellite telemetry uplink, and SCADA industrial network",
+  "nodes": [
+    {
+      "id": "supplier_ext_portal",
+      "name": "External Supplier Web Portal",
+      "type": "public",
+      "exposure": "public",
+      "software": "Apache Tomcat 9.0.43"
+    },
+    {
+      "id": "vpn_contractor_gateway",
+      "name": "Contractor VPN Gateway",
+      "type": "public",
+      "exposure": "public",
+      "software": "Pulse Secure Connect 9.1"
+    },
+    {
+      "id": "perimeter_firewall_dmz",
+      "name": "DMZ Perimeter NextGen Firewall",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "Palo Alto PAN-OS 10.1"
+    },
+    {
+      "id": "satellite_telemetry_station",
+      "name": "Satellite Telemetry Uplink Station",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "Embedded QNX RTOS"
+    },
+    {
+      "id": "corp_active_directory",
+      "name": "Defense AD Domain Controller",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "Windows Server 2022 AD"
+    },
+    {
+      "id": "drone_firmware_repo",
+      "name": "UAV Drone Firmware Repository",
+      "type": "internal",
+      "exposure": "internal",
+      "software": "GitLab Enterprise 13.10"
+    },
+    {
+      "id": "siemens_scada_plc",
+      "name": "Siemens SCADA Manufacturing PLC",
+      "type": "critical",
+      "exposure": "critical",
+      "software": "Siemens S7-1500 PLC Firmware"
+    },
+    {
+      "id": "classified_cad_vault",
+      "name": "Classified Defense CAD Vault",
+      "type": "critical",
+      "exposure": "critical",
+      "software": "RHEL 8 Defense File Vault"
+    },
+    {
+      "id": "cryptographic_key_hsm",
+      "name": "Defense HSM Cryptographic Core",
+      "type": "critical",
+      "exposure": "critical",
+      "software": "Thales Luna HSM 7.4"
+    }
+  ],
+  "edges": [
+    { "from": "supplier_ext_portal", "to": "perimeter_firewall_dmz", "protocol": "HTTPS" },
+    { "from": "vpn_contractor_gateway", "to": "perimeter_firewall_dmz", "protocol": "TLS" },
+    { "from": "perimeter_firewall_dmz", "to": "satellite_telemetry_station", "protocol": "TCP" },
+    { "from": "perimeter_firewall_dmz", "to": "corp_active_directory", "protocol": "LDAP" },
+    { "from": "corp_active_directory", "to": "drone_firmware_repo", "protocol": "Kerberos" },
+    { "from": "drone_firmware_repo", "to": "classified_cad_vault", "protocol": "SSH" },
+    { "from": "satellite_telemetry_station", "to": "siemens_scada_plc", "protocol": "Proprietary" },
+    { "from": "siemens_scada_plc", "to": "cryptographic_key_hsm", "protocol": "TLS" },
+    { "from": "classified_cad_vault", "to": "cryptographic_key_hsm", "protocol": "Proprietary" }
+  ]
+}
